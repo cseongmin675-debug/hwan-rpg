@@ -1,1 +1,1 @@
-현재 GitHub 저장소의 index.html 하나만 교체하세요. 기존 server.js, package.json 및 브라우저 저장 데이터를 삭제하지 마세요. Render 배포가 완료되면 같은 주소로 접속하세요.
+기존 캐릭터의 브라우저 저장 기록을 지우지 마세요. GitHub 저장소의 index.html만 이 파일로 교체하고 Commit changes 하세요. Render 자동 배포 후 기존 주소에서 접속하세요. 모바일 조작, 온라인 서버 파일은 변경하지 않습니다.
