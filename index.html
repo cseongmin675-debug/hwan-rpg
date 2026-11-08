@@ -1,0 +1,662 @@
+<!doctype html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>환 RPG | 마법 귀환 · 모바일 완전 지원</title><style>
+:root{color-scheme:dark;--bg:#080e1b;--panel:#111d32;--line:#30435d;--gold:#f7cc75;--ink:#f4f1e6;--muted:#a8b7ca;--blue:#68c8ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 45% 0,#23395b 0,#080d19 75%);color:var(--ink);font:14px system-ui,'Malgun Gothic',sans-serif}button,input{font:inherit}button{background:#253c59;border:1px solid #57718e;color:#fff;border-radius:9px;padding:9px 12px;cursor:pointer}button:hover:not(:disabled){background:#365777}button:disabled{opacity:.45;cursor:not-allowed}.gold{color:var(--gold)}.muted{color:var(--muted)}.shell{max-width:1310px;margin:auto;padding:14px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:12px}.brand{font-size:clamp(23px,3vw,33px);font-weight:1000;letter-spacing:-1px;text-shadow:0 3px #552f30}.tag{font-size:11px;border:1px solid #6c5c3c;background:#5543224a;color:#ffe3a9;border-radius:30px;padding:5px 10px;display:inline-block}.layout{display:grid;grid-template-columns:minmax(0,1fr) 312px;gap:14px}.field{position:relative;min-width:0}.board{position:relative;border:2px solid #7186a1;border-radius:17px;overflow:hidden;box-shadow:0 19px 50px #000a;background:#193a44}.board canvas{display:block;width:100%;height:auto;aspect-ratio:16/10}.hud{position:absolute;left:12px;top:11px;display:flex;gap:7px;pointer-events:none;flex-wrap:wrap}.chip{background:#091726df;border:1px solid #587088;border-radius:8px;padding:6px 9px;font-size:12px;backdrop-filter:blur(5px)}.toast{position:absolute;top:64px;left:50%;transform:translateX(-50%);background:#121d31ed;border:1px solid #e6bd70;border-radius:9px;padding:9px 14px;pointer-events:none;opacity:0;transition:opacity .2s;max-width:90%;text-align:center;z-index:3}.toast.show{opacity:1}.bottom{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center}.bottom button{padding:8px 11px}.slot{background:#1b2843;border:1px solid #637b9b;border-radius:9px;display:inline-flex;align-items:center;gap:6px;padding:7px 9px;font-size:12px}.side{display:flex;flex-direction:column;gap:11px}.card{background:linear-gradient(145deg,#16243b,#10192d);border:1px solid #344761;border-radius:13px;padding:13px;box-shadow:0 7px 24px #0003}.card h3{margin:0 0 10px;font-size:15px;color:#f7d793}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:6px 0}.meter{height:9px;background:#060e1e;border:1px solid #243956;border-radius:30px;overflow:hidden}.fill{height:100%;transition:width .2s;background:linear-gradient(90deg,#ff6677,#ffac9a)}.fill.mana{background:linear-gradient(90deg,#448dff,#79dbff)}.fill.exp{background:linear-gradient(90deg,#b9903c,#ffe39c)}.small{font-size:12px;line-height:1.55}.quest{border-left:3px solid #f6ca71;padding-left:9px;margin:10px 0}.quest strong{color:#ffdf8e}.progress{color:#99d5ff;font-size:12px}.log{max-height:140px;overflow:auto;font-size:12px;color:#bccddd;line-height:1.7}.log div{border-bottom:1px solid #24354b;padding:3px 0}.overlay{position:fixed;inset:0;z-index:10;background:#070c19df;display:flex;justify-content:center;align-items:center;padding:16px;backdrop-filter:blur(9px)}.modal{width:min(810px,100%);max-height:94vh;overflow:auto;background:linear-gradient(150deg,#223a55,#101a2c 75%);border:1px solid #8ca0b7;border-radius:22px;box-shadow:0 30px 100px #000c;padding:clamp(18px,3vw,30px)}.modal h1{font-size:clamp(27px,4vw,39px);margin:5px 0 7px;color:#ffdc92}.modal h2{color:#ffdb97}.modal input{width:100%;background:#0b192b;border:1px solid #7393b3;color:#fff;border-radius:10px;padding:13px;font-size:17px;outline:none}.classes{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:15px 0}.class{background:#0e1c30;border:1px solid #425e7c;padding:10px;min-height:105px;border-radius:11px;cursor:pointer;text-align:left}.class.active{border-color:#ffd27b;background:#4c412e;box-shadow:inset 0 0 0 1px #ffd27b}.class b{display:block;font-size:14px;margin:4px 0}.class span{font-size:25px}.class small{display:block;font-size:11px;color:#b8c7d9}.primary{background:linear-gradient(110deg,#b78b43,#edc77b);border-color:#ffdb8b;color:#21190d;font-weight:850}.warning{color:#ffafab}.dialog{position:absolute;bottom:14px;left:3%;width:94%;z-index:5;background:#0c1727ed;border:1px solid #e4bd78;border-radius:13px;padding:15px;box-shadow:0 12px 30px #0009;display:none}.dialog h3{margin:0 0 7px;color:#ffd98b}.choices{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.choices button{flex:1;min-width:115px}.skillgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}.skill{background:#101e35;border:1px solid #394f69;border-radius:8px;padding:8px;font-size:12px}.inventoryGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.bagItem{background:#101d30;border:1px solid #41536c;border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:7px;font-size:17px}.bagItem small{font-size:12px;color:#b8c6d8}.lookrow{margin:14px 0;padding-bottom:9px;border-bottom:1px solid #384b60}.lookopts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.swatch{border-left:8px solid var(--swatch)}.chosen{outline:2px solid #ffdb8e;background:#5c4d30}.footer{margin-top:12px;text-align:center;font-size:11px;color:#90a5be}.touch{display:none;gap:6px;justify-content:space-between;margin-top:11px}.pad{display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,37px);gap:3px}.pad button{padding:0}.actions{display:flex;gap:6px;align-items:center}.actions button{padding:12px}.hide{display:none!important}@media(max-width:900px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.classes{grid-template-columns:repeat(3,1fr)}.touch{display:flex}}@media(max-width:500px){.classes{grid-template-columns:repeat(2,1fr)}.side{display:block}.card{margin-top:8px}.modal{padding:16px}.tag{display:none}.hud .chip{font-size:10px;padding:4px}}
+
+/* 대형 장비 업데이트: 게임의 어두운 판타지 UI */
+:root{--bg:#07101b;--panel:#13253a;--line:#426079;--gold:#ffd888}
+body{background:radial-gradient(ellipse at 12% 5%,#203e5d 0,transparent 55%),linear-gradient(135deg,#060b14,#132638 57%,#090e18);background-attachment:fixed}
+.card{border-color:#47617c88;box-shadow:0 14px 40px #030b1936,inset 0 1px #ffffff12}
+.board{border:2px solid #b5a17a;border-radius:15px;box-shadow:0 12px 50px #030915aa,0 0 0 5px #273e50}
+.top{background:linear-gradient(100deg,#16253aee,#253849bf);border:1px solid #56718a70;border-radius:17px;padding:16px 20px;box-shadow:0 10px 36px #0004}
+button{transition:background .16s,transform .16s,border-color .16s}
+button:hover:not(:disabled){transform:translateY(-1px);border-color:#e6d095}
+.dialog{max-height:87%;overflow-y:auto;scrollbar-color:#6485a5 #142436}
+.inventoryGrid.upgradedShop{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.gearcard{border:1px solid color-mix(in srgb,var(--tier) 60%,#31455e);background:linear-gradient(135deg,#182d42,#102032);position:relative;gap:11px;min-height:154px;box-shadow:inset 0 1px #ffffff12}
+.gearcard:before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--tier);border-radius:10px 10px 0 0}
+.gearhead{display:flex;align-items:center;gap:11px}.gearicon{font-size:25px;width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--tier);border-radius:12px;background:#ffffff0c}
+.geartitle{display:flex;flex-direction:column;gap:4px;min-width:0}.geartitle b{color:#f1f8ff;font-size:14px}.geartitle small{font-size:11px;color:var(--tier)}
+.compar{font-size:11px;font-weight:700}.compar.up{color:#8ee5b6}.compar.down{color:#ffbd9b}.gearbottom{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:auto}.gearbottom button{font-size:12px;padding:7px 12px}
+.shopintro{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:10px 0 14px;color:#c7d8e8}.shopintro b{color:#ffe1a0}.shopfilters{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px}.shopfilters button{font-size:12px;padding:7px 11px}
+@media(max-width:650px){.inventoryGrid.upgradedShop{grid-template-columns:repeat(2,minmax(0,1fr))}.gearcard{min-height:175px}.gearhead{flex-wrap:wrap}.shopfilters button{padding:6px 8px}}
+
+/* 모험가 리마스터: 5칸 스킬벨트 · 수련 배낭 · 개선된 정보 밀도 */
+.skillbelt{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:9px 0 0}.beltcell{min-height:59px;background:linear-gradient(145deg,#192f48,#0e172a);border:1px solid #6e8da9;border-radius:10px;padding:7px 3px;cursor:pointer;text-align:center;position:relative;box-shadow:inset 0 1px #ffffff1a,0 5px 14px #0004}.beltcell b{display:block;color:#ffd787;font-size:12px}.beltcell span{display:block;font-size:10px;color:#c9d9ea;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.beltcell.cooling{border-color:#4a576a;opacity:.75}.beltcell.empty{border-style:dashed;color:#849ab0}.skillbag{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin:12px 0}.skillcard{padding:13px;background:linear-gradient(145deg,#1d354b,#0a1728);border:1px solid #5b7692;border-radius:12px;display:flex;flex-direction:column;gap:9px}.skillcard b{color:#ffe0a5}.skillcard small{color:#b8c9dc;line-height:1.55}.slotpicker{display:flex;gap:5px;flex-wrap:wrap}.slotpicker button{padding:6px 10px}.skillcard .equipped{border-color:#e7ca89;background:#5a492c}.training{padding:10px 12px;margin:9px 0;border:1px solid #ab885b;border-radius:10px;background:#5440223c;color:#ffe4b0}.board:after{content:'';position:absolute;inset:0;border:1px solid #f4dfad55;pointer-events:none;border-radius:15px}.hero-stat{color:#a9efd3}.style-presentation{letter-spacing:.01em}@media(max-width:620px){.skillbelt{gap:3px}.beltcell{padding:6px 1px;min-height:58px}.beltcell span{font-size:9px}.skillbag{grid-template-columns:1fr}}
+
+/* 보유 스킬 창과 단축 슬롯 분리 */
+.skillmanager{margin:16px 0 8px;padding:16px;border:1px solid #647f9e;border-radius:16px;background:linear-gradient(155deg,#152b45,#0d1b2d);box-shadow:inset 0 1px #ffffff1a}
+.skillmanager h3{margin:4px 0 8px;color:#ffe0a3}.skillmanager .guide{font-size:12px;color:#c1d2e5;line-height:1.7}
+.skilllibrary{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:9px;margin:10px 0 18px;min-height:75px;padding:10px;border:1px solid #354f69;border-radius:12px;background:#07162688}
+.skillpick{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;min-height:88px;padding:12px;background:#203751;border:2px solid #55708c;border-radius:11px}
+.skillpick strong{color:#ffe1a1}.skillpick small{color:#b3cbe2}.skillpick.selected{border-color:#ffde8a;background:#55452b;box-shadow:0 0 0 2px #ffd28044}.skillpick.equipped{border-color:#6cd4af}
+.skillassign{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:10px}
+.skilltarget{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:95px;min-width:0;padding:8px 4px;border:2px dashed #53718d;background:#101e34;border-radius:12px}
+.skilltarget b{color:#ffcf78;font-size:16px}.skilltarget span{font-size:12px;line-height:1.35;overflow-wrap:anywhere}.skilltarget small{font-size:10px;color:#adc1d5}
+.skilltarget.filled{border-style:solid;border-color:#83a6c7}.skilltarget.ready{border-color:#ffd98b;background:#3f3628}
+.skillmanager .skillactions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.skillmanager .skillactions button{font-size:12px}
+@media(max-width:600px){.skillassign{gap:4px}.skilltarget{min-height:90px;padding:5px 2px}.skilltarget span{font-size:10px}.skillmanager{padding:10px}}
+.pinnedQuest{position:absolute;left:12px;top:100px;width:235px;max-height:45%;overflow:auto;background:#071525d9;border:1px solid #d5b66b80;border-radius:12px;padding:10px;box-shadow:0 6px 25px #0007;z-index:2;pointer-events:auto}.pinnedTitle{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:bold;color:#ffdc90;margin-bottom:6px}.pinnedTitle button{font-size:15px;padding:0 6px;background:#273950}.pinnedQuest .quest{margin:5px 0 8px;font-size:11px;line-height:1.45}.pinnedQuest .quest strong{font-size:11px}.pinnedQuest .progress{font-size:11px}.pinnedQuest .emptyQ{font-size:11px;color:#bad0d8}@media(max-width:600px){.pinnedQuest{width:180px;top:87px;max-height:30%}.pinnedQuest .quest{font-size:10px}}
+
+/* C키 귀환 캐스팅 안내 */
+#returnChannel{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);z-index:6;width:min(380px,78%);padding:13px 16px;background:#0a2034e9;border:2px solid #8ce9d6;border-radius:14px;box-shadow:0 0 22px #4fffe64d;color:#efffff;text-align:center;display:none;pointer-events:none}
+#returnChannel .return-meter{margin-top:9px;height:13px;background:#19394a;border-radius:100px;overflow:hidden;border:1px solid #7fb8bc}
+#returnProgress{height:100%;width:0%;background:linear-gradient(90deg,#48caca,#caffd9);transition:width .05s linear}
+#returnChannel strong{font-size:16px}
+
+/* Mobile controls: full keyboard parity and large tap targets */
+.touch{display:none;flex-direction:column;gap:10px;background:#111e34;border:1px solid #526780;border-radius:15px;padding:12px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.touchTop{display:flex;flex-wrap:wrap;justify-content:space-between;gap:5px;font-weight:800;color:#ffe3a3}.touchTop span+span{font-size:11px;font-weight:400;color:#b6d4e8}
+.mobileControlRow{display:flex;gap:12px;align-items:center;justify-content:space-between}.pad{flex:none;display:grid;grid-template-columns:repeat(3,51px);grid-template-rows:repeat(3,51px);gap:4px;touch-action:none}
+.pad button{padding:0;font-size:22px;touch-action:none;background:#345471;border:1px solid #9cc2df}.pad button:active,.mobileRight button:active{background:#5b8c9e;transform:scale(.97)}.pad .padCenter{opacity:.35;font-size:16px}
+.mobileRight{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}.mobileSkills{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.mobileSkills button{padding:11px 2px;font-size:13px;background:#43365c;border-color:#9b7bda;min-height:48px}
+.mobileCombat{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:5px}.mobileCombat button{padding:11px 3px;min-height:48px}.mobileAttack{background:#813a4b;border-color:#f394a0}
+.mobileUtilities{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.mobileUtilities button{padding:10px 3px;font-size:12px;min-height:43px}.mobileUtilities button.active{border-color:#6cffc7;background:#235b55}
+.mobileReturn{position:relative;display:flex;justify-content:space-between;align-items:center;gap:6px;width:100%;min-height:55px;padding:12px;background:linear-gradient(105deg,#115765,#224a7b);border:2px solid #74e7d7;font-size:14px;font-weight:900;touch-action:none;overflow:hidden}.mobileReturn.channeling{box-shadow:0 0 20px #75ffdcaa;animation:returnPulse .7s ease-in-out infinite alternate}
+@keyframes returnPulse{from{border-color:#69d9d0}to{border-color:#fff5b2}}
+@media(max-width:900px){.touch{display:flex}.board{touch-action:manipulation}.hud{max-width:65%}.hud .chip{font-size:10px}}
+@media(max-width:560px){.shell{padding:6px}.layout{gap:8px}.brand{font-size:20px}.top{gap:6px}.hud #hintTag{display:none}.pinnedQuest{left:4px;top:45px;width:135px;max-height:33%;padding:5px}.pinnedQuest .pinnedTitle{font-size:10px}.pinnedQuest .quest{font-size:9px}.board #minimap{width:112px!important;height:76px!important;right:5px!important;top:5px!important}.touch{padding:8px}.pad{grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,44px);gap:3px}.mobileControlRow{gap:6px}.mobileSkills button{font-size:11px;min-height:44px}.mobileCombat button{font-size:11px;min-height:43px}.mobileUtilities button{font-size:10px;min-height:40px}.mobileReturn{font-size:12px}.dialog{bottom:5px;max-height:88%;overflow:auto;padding:9px}.dialog .choices button{min-width:85px}}
+</style><style>
+#onlinePanel{position:absolute;right:12px;top:12px;z-index:6;width:min(265px,42%);background:#101d30e8;border:1px solid #83b0bb;border-radius:12px;padding:9px;box-shadow:0 4px 16px #0005;font:12px system-ui}
+#onlinePanel .online-head{display:flex;justify-content:space-between;gap:8px;align-items:center;font-weight:700}
+#onlineStatus{color:#f5ce7b}#onlineMessages{margin:8px 0;height:94px;overflow-y:auto;overflow-x:hidden;background:#081320aa;border-radius:6px;padding:6px;word-break:break-word}
+#onlineMessages div{margin-bottom:4px}#onlineMessages b{color:#a9e6fb}#onlineChatForm{display:flex;gap:4px}#onlineChatInput{min-width:0;flex:1;width:70px;background:#071320;border:1px solid #52758d;border-radius:6px;color:#fff;padding:6px;font-size:12px}
+#onlineChatForm button{padding:4px 7px;font-size:12px}
+@media(max-width:700px){#onlinePanel{right:4px;top:5px;width:180px;padding:5px}#onlineMessages{height:44px}#onlineChatInput{font-size:11px}}
+</style></head><body><div class="shell"><header class="top"><div><div class="brand">⚔️ 환 RPG <span class="gold">: 전직관 표지판 복귀 · 50레벨 성장</span></div><div class="muted small">20개 직업의 전직관 · 스킬 시범 · 장비와 퀘스트의 오프라인 판타지</div></div><div><span class="tag">✨ 모험 · 성장 · 퀘스트 전직</span> <button id="inventoryTopBtn" class="primary">🎒 배낭 (B)</button> <button id="saveBtn">💾 저장</button> </div></header><div class="layout"><section class="field"><div class="board"><div id="onlinePanel"><div class="online-head"><span>🌍 환 RPG 온라인</span><span id="onlineStatus">연결 중…</span></div><div id="onlineMessages" role="log" aria-live="polite"><div>친구들과 같은 주소로 접속해 봐!</div></div><form id="onlineChatForm" autocomplete="off"><input id="onlineChatInput" maxlength="120" placeholder="채팅 입력 · Enter" aria-label="채팅 메시지"><button type="submit">전송</button></form></div><canvas id="game" width="960" height="600"></canvas><div class="hud"><div class="chip" id="zoneTag">🌲 초원의 끝자락</div><div class="chip" id="hintTag">E 대화 · 좌클릭 공격 · C 4초 마을 귀환 · V 꾸미기 · = ×3 직업 포기</div></div><div class="toast" id="toast"></div><div id="returnChannel"><strong id="returnLabel">🏠 마을 귀환 준비 중…</strong><div class="return-meter"><div id="returnProgress"></div></div><div style="font-size:11px;margin-top:5px;color:#bce6e6">C키를 4초 동안 계속 누르세요 · 시전 중 무적 · 손을 떼면 취소</div></div><div id="pinnedQuests" class="pinnedQuest"><div class="pinnedTitle">📜 진행 중인 임무 <button id="pinToggle" type="button" title="퀘스트 접기">−</button></div><div id="pinnedQuestItems"></div></div><canvas id="minimap" width="190" height="128" style="position:absolute;right:11px;top:11px;width:190px;height:128px;border:1px solid #c7b88a;border-radius:9px;background:#0a1d26dc;box-shadow:0 3px 16px #0008"></canvas><div class="dialog" id="dialog"><h3 id="dialogTitle"></h3><div id="dialogText" class="small"></div><div class="choices" id="dialogChoices"></div></div></div><div class="skillbelt" id="skillbelt"></div><div class="bottom"><span class="slot">🎮 WASD / 방향키 이동</span><span class="slot" id="runChip">🚶 걷기 · Shift 달리기 전환</span><span class="slot">⚔️ 좌클릭 공격 · 활은 화살 1발 소모</span><span class="slot">✨ 1~5 스킬</span><span class="slot">💬 E 대화</span><span class="slot">🏠 C 4초 누르기: 무적 귀환 · V 꾸미기</span><span class="slot">🧪 H 포션</span><span class="slot">🎒 B 배낭 · 스킬 배치</span><span class="slot">⚠️ =키 3번(또는 숫자패드 +): 직업 포기 확인</span><button id="autoSaveBtn">📖 퀘스트 목록</button><button id="inventoryBtn">🎒 배낭 (B)</button><button id="customBtn">🎨 캐릭터 꾸미기 (V)</button></div><div class="touch" id="mobileControls"><div class="touchTop"><span>📱 모바일 조작</span><span>이동 패드를 누른 채 이동 · 귀환 버튼 4초 길게 누르기</span></div><div class="mobileControlRow"><div class="pad"><span></span><button data-key="w" aria-label="위로 이동">▲</button><span></span><button data-key="a" aria-label="왼쪽 이동">◀</button><button class="padCenter" type="button" disabled>✥</button><button data-key="d" aria-label="오른쪽 이동">▶</button><span></span><button data-key="s" aria-label="아래로 이동">▼</button><span></span></div><div class="mobileRight"><div class="mobileSkills"><button data-hit="skill1">✨ 1</button><button data-hit="skill2">✨ 2</button><button data-hit="skill3">✨ 3</button><button data-hit="skill4">✨ 4</button><button data-hit="skill5">✨ 5</button></div><div class="mobileCombat"><button class="mobileAttack" data-hit="attack">⚔️ 공격</button><button data-hit="talk">💬 대화</button><button data-hit="heal">🧪 회복</button></div></div></div><div class="mobileUtilities"><button data-hit="inventory">🎒 배낭</button><button data-hit="run" id="mobileRun">🏃 달리기</button><button data-hit="customize">🎨 꾸미기</button><button data-hit="map">🗺️ 지도</button><button data-hit="guide">🧭 NPC</button><button data-hit="quests">📜 안내</button><button data-hit="save">💾 저장</button><button data-hit="resign">⚠️ 직업 포기(3회)</button></div><button type="button" class="mobileReturn" id="mobileReturn" aria-label="4초간 눌러 마을 귀환">🏠 마을 귀환 — 4초 동안 꾹 누르기 <span id="mobileReturnPercent">0%</span></button></div></section><aside class="side"><section class="card"><h3>🛡️ 모험가 정보</h3><div class="row"><b id="name">모험가 · Lv.1</b><span id="level">⚔️ 공격력 0</span></div><div class="row small"><span id="job">초보 모험가</span><span id="money" class="gold">0 G</span></div><div class="row small"><span id="weapon">👐 장비: 맨손</span></div><div class="row small"><span id="armorHUD">🛡️ 방어구: 없음 (방어력 0)</span></div><div class="row small"><span>❤️ 생명력</span><span id="hpText"></span></div><div class="meter"><div id="hpBar" class="fill"></div></div><div class="row small"><span>💠 마력</span><span id="mpText"></span></div><div class="meter"><div id="mpBar" class="fill mana"></div></div><div class="row small"><span>⭐ 경험치</span><span id="xpText"></span></div><div class="meter"><div id="xpBar" class="fill exp"></div></div><div class="row small"><span>🧪 포션 <b id="potions"></b></span><span id="kills"></span></div><div class="row small"><span>🎒 토끼 간</span><b id="rabbitLiver">0개</b></div><div class="row small"><span>🏹 화살</span><b id="arrowCount">0개</b></div></section><section class="card"><h3>📜 진행 중 퀘스트</h3><div id="quests" class="small"></div><div class="row"><button id="questNpcBtn">🧭 전직관 찾기</button><button id="mapBtn">🗺️ 지역 안내</button></div></section><section class="card"><h3>✨ 기술 / 전직</h3><div id="career" class="small"></div><div class="skillgrid" id="skills"></div></section><section class="card"><h3>📢 모험 기록</h3><div class="log" id="log"></div></section></aside></div><div class="footer">게임 파일 하나로 실행 · 닉네임은 처음 정한 뒤 변경할 수 없음 · 세이브는 이 브라우저에 저장</div></div><div class="overlay" id="intro"><div class="modal"><span class="tag">THE CHAOS KINGDOM · ACT I</span><h1>환 RPG</h1><div class="muted">왕국의 마법 시계가 멈췄다. 모험가는 엉뚱한 주민들의 부탁을 해결하고 자신의 운명을 선택한다.</div><div id="newForm"><h2>모험가 등록</h2><p>닉네임은 <b class="gold">한 번만</b> 정할 수 있으며 생성 후 변경할 수 없어!</p><input id="nick" maxlength="12" placeholder="닉네임 (2~12자)" autocomplete="off"/><p class="muted">처음에는 <b>초보 모험가</b>로 출발해. 5레벨이 되면 원하는 직업의 전직관을 찾아 퀘스트를 받아!</p><p class="warning small" id="formError"></p><button class="primary" id="create" style="width:100%;font-size:17px;padding:13px">모험 시작 ⚔️</button></div><div id="continueForm" class="hide"><h2 id="welcome"></h2><p>저장된 모험을 계속할 수 있어. 닉네임은 고정이야.</p><button class="primary" id="continue" style="width:100%;padding:13px">계속 모험하기 ▶</button></div></div></div><script>
+(()=>{'use strict';const KEY='chaos_rpg_2026_edition_v2',cv=document.getElementById('game'),ctx=cv.getContext('2d'),W=960,H=600,$=id=>document.getElementById(id);
+const JOBS=[['전사','⚔️','높은 체력과 근접 공격','#e6ad69',['검투사','수호기사']],['마법사','🔮','원거리 마법과 광역 폭발','#ba9bff',['화염술사','빙결술사']],['궁수','🏹','빠른 원거리 연속 공격','#92df83',['명사수','바람사수']],['도적','🗡️','빠른 이동과 치명타','#e3a8d9',['암살자','그림자도적']],['성직자','✨','회복과 신성한 힘','#fff0a5',['사제','심판관']],['무도가','🥊','연속 타격과 기력','#ffad81',['권성','투신']],['창술사','🔱','넓은 공격 범위','#b8dbff',['용창기사','폭풍창사']],['소환사','🐺','동료 정령과 함께 전투','#a7eebf',['정령술사','마수조련사']],['연금술사','⚗️','독과 폭발 물약','#e7db8f',['폭약사','현자의 손']],['음유시인','🎵','음파 공격과 강화','#f5a7ce',['전투악사','천상의 노래꾼']],['기계공','⚙️','기계탄과 자동포탑','#a3c7e0',['포격수','기계기사']],['주술사','🪄','저주와 영혼 공격','#c7a4f7',['영혼술사','저주술사']],['테이머','🐾','동물을 길들이고 동료를 소환','#93dfba',['야수조련사','환수지배자']],['버퍼','💚','자신을 강화하고 회복하는 지원가','#86e7ce',['응원술사','성역지휘관']],['흑기사','🖤','어둠의 검술과 생명 흡수','#a3a0c9',['암흑검사','심연기사']],['검객','🗡️','강력한 연속 검술','#f4bb91',['쾌검사','검성']],['정령사','🌿','자연의 정령과 함께 전투','#8ee5a1',['숲의 수호자','대정령사']],['환술사','🌀','환영과 교란의 마법','#a9bfff',['환영술사','몽환지배자']],['사냥꾼','🎯','정확한 사격과 추격','#b7dca3',['추적자','마수사냥꾼']],['무희','💃','춤으로 공격하고 아군을 강화','#f3a9cf',['검무사','달빛무희']]];
+let onlineSocket=null,onlineId=null,otherPlayers=new Map(),lastNetSend=0,lastNetState='',onlineReconnect=0;
+let selected=0,player=null,world=[],enemies=[],particles=[],projectiles=[],floats=[],keys={},dialogOpen=false,frame=0,last=performance.now(),lastSave=0,toastTimer=null,story={};let worldWidth=29400,worldHeight=20400,cam={x:0,y:0};let bushes=[],rocks=[],trees=[];let trainerDemos=[];let motionFX=[];let running=false;let pinnedCollapsed=false;let resignPresses=0,resignLastPress=0;let returnStarted=0,returnHeld=false;let returnArrival=null;
+let rand=(min,max)=>min+Math.random()*(max-min),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),MAX_LEVEL=50,xpRequired=lv=>lv>=MAX_LEVEL?1:Math.round((35+lv*lv*11+lv*15)*(lv<10?1:1+(lv-9)*.12+Math.pow(lv-9,2)*.006));
+function makeWorld(){let seed=17;const r=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);trees=[];rocks=[];bushes=[];for(let i=0;i<4700;i++){let x=35+r()*(worldWidth-70),y=35+r()*(worldHeight-70);if(Math.hypot(x-340,y-310)<230||Math.hypot(x-1250,y-670)<130)continue;trees.push({x,y,s:0.65+r()*.65})}for(let i=0;i<1800;i++)rocks.push({x:30+r()*(worldWidth-60),y:30+r()*(worldHeight-60),s:8+r()*13});for(let i=0;i<6500;i++)bushes.push({x:15+r()*(worldWidth-30),y:15+r()*(worldHeight-30),t:r()});}
+const NPCS=[{id:'mayor',x:280,y:250,name:'마을 이장',icon:'👴',color:'#f4ba6e'},{id:'merchant',x:330,y:420,name:'물약 상인',icon:'🧪',color:'#aceab7'},{id:'weaponseller',x:475,y:290,name:'무기 상인',icon:'⚔️',color:'#f5b578'},{id:'armorseller',x:445,y:510,name:'방어구 상인',icon:'🛡️',color:'#91cafa'},{id:'junkdealer',x:600,y:385,name:'잡화 상인',icon:'🪙',color:'#efd68b'},{id:'forge',x:630,y:545,name:'마을 대장장이',icon:'🔨',color:'#ee987e'},{id:'bard',x:510,y:450,name:'수다쟁이 음유시인',icon:'🎭',color:'#f7badf'},{id:'master',x:1300,y:610,name:'유적 수호자',icon:'👑',color:'#facd83'}];
+const TRAINER_SPOTS=[[2200,700],[4200,420],[6400,860],[8950,1100],[9100,3400],[7600,5550],[5450,6150],[3450,5200],[1350,5750],[980,3520],[4550,3140],[7150,2850],[9600,6200],[2600,6350],[9200,5900],[7000,6300],[3350,6100],[8800,6100],[5200,5850],[1700,6100]];
+JOBS.forEach((j,i)=>{const [x,y]=TRAINER_SPOTS[i];NPCS.push({id:'trainer',job:i,x,y,name:j[0]+' 전직관',icon:j[1],color:j[3]})});
+const ENEMY_TYPES=[
+{name:'초원 토끼',icon:'🐇',color:'#ead6b6',lv:1,hp:28,atk:5,xp:24,gold:8,speed:78,loot:'토끼 간',chance:.4},
+{name:'성난 버섯',icon:'🍄',color:'#e2a0c4',lv:3,hp:65,atk:12,xp:35,gold:12,speed:75,loot:'버섯 포자',chance:.55},
+{name:'까칠한 고블린',icon:'👺',color:'#ccae68',lv:6,hp:115,atk:22,xp:68,gold:25,speed:88,loot:'고블린 이빨',chance:.4},
+{name:'혼돈의 늑대',icon:'🐺',color:'#9eaee3',lv:12,hp:230,atk:41,xp:135,gold:52,speed:113,loot:'늑대 송곳니',chance:.45},
+{name:'이끼 슬라임',icon:'🟢',color:'#80dbaf',lv:2,hp:45,atk:8,xp:30,gold:10,speed:47,loot:'슬라임 젤리',chance:.6},
+{name:'돌진 멧돼지',icon:'🐗',color:'#b58a73',lv:8,hp:160,atk:29,xp:90,gold:32,speed:105,loot:'멧돼지 가죽',chance:.5},
+{name:'고대 골렘',icon:'🗿',color:'#a3b2c7',lv:19,hp:430,atk:67,xp:235,gold:95,speed:48,loot:'마력 광석',chance:.48},
+{name:'어둠 까마귀',icon:'🐦‍⬛',color:'#aa8ec5',lv:15,hp:275,atk:48,xp:178,gold:62,speed:125,loot:'검은 깃털',chance:.5},
+{name:'푸른 드레이크',icon:'🐉',color:'#76cce5',lv:27,hp:640,atk:91,xp:365,gold:160,speed:93,loot:'용의 비늘',chance:.35},
+{name:'들쥐',icon:'🐁',color:'#d6c8b6',lv:2,hp:38,atk:7,xp:26,gold:9,speed:90,loot:'작은 털가죽',chance:.35},
+{name:'숲 거미',icon:'🕷️',color:'#a899bd',lv:4,hp:83,atk:16,xp:47,gold:18,speed:91,loot:'거미줄',chance:.5},
+{name:'독 개구리',icon:'🐸',color:'#72c99b',lv:7,hp:140,atk:27,xp:85,gold:31,speed:77,loot:'독주머니',chance:.4},
+{name:'사막 전갈',icon:'🦂',color:'#e9bb72',lv:14,hp:280,atk:51,xp:170,gold:70,speed:108,loot:'전갈 꼬리',chance:.5},
+{name:'모래 도마뱀',icon:'🦎',color:'#dbba77',lv:17,hp:350,atk:63,xp:215,gold:91,speed:116,loot:'도마뱀 비늘',chance:.45},
+{name:'설원 여우',icon:'🦊',color:'#d9eff8',lv:13,hp:250,atk:45,xp:155,gold:61,speed:124,loot:'하얀 털',chance:.42},
+{name:'얼음 정령',icon:'❄️',color:'#83dfff',lv:21,hp:460,atk:74,xp:268,gold:116,speed:88,loot:'얼음 결정',chance:.4},
+{name:'늪 악어',icon:'🐊',color:'#799d74',lv:18,hp:405,atk:66,xp:238,gold:101,speed:79,loot:'악어 가죽',chance:.45},
+{name:'저주받은 허수아비',icon:'🎃',color:'#d4a663',lv:24,hp:560,atk:86,xp:310,gold:141,speed:63,loot:'저주 인형',chance:.4},
+{name:'화산 불도마뱀',icon:'🔥',color:'#ff9974',lv:29,hp:735,atk:103,xp:408,gold:192,speed:100,loot:'화염 비늘',chance:.42},
+{name:'용암 정령',icon:'🌋',color:'#ff6b5a',lv:35,hp:1080,atk:139,xp:530,gold:271,speed:82,loot:'용암 핵',chance:.32},
+{name:'협곡 바위게',icon:'🦀',color:'#c6a18f',lv:11,hp:225,atk:39,xp:131,gold:49,speed:69,loot:'바위 껍질',chance:.52},
+{name:'벚꽃 나비',icon:'🦋',color:'#f3b7dc',lv:9,hp:175,atk:31,xp:102,gold:38,speed:104,loot:'꽃가루',chance:.55},
+{name:'그림자 망령',icon:'👻',color:'#b3aedc',lv:31,hp:820,atk:117,xp:462,gold:219,speed:102,loot:'망령의 조각',chance:.3}
+];
+const MATERIALS=['토끼 간','버섯 포자','고블린 이빨','늑대 송곳니','슬라임 젤리','멧돼지 가죽','마력 광석','검은 깃털','용의 비늘','작은 털가죽','거미줄','독주머니','전갈 꼬리','도마뱀 비늘','하얀 털','얼음 결정','악어 가죽','저주 인형','화염 비늘','용암 핵','바위 껍질','꽃가루','망령의 조각'];
+const SELL_PRICES={'토끼 간':9,'버섯 포자':18,'고블린 이빨':38,'늑대 송곳니':95,'슬라임 젤리':13,'멧돼지 가죽':48,'마력 광석':200,'검은 깃털':120,'용의 비늘':420,'작은 털가죽':11,'거미줄':26,'독주머니':49,'전갈 꼬리':90,'도마뱀 비늘':115,'하얀 털':76,'얼음 결정':190,'악어 가죽':150,'저주 인형':235,'화염 비늘':290,'용암 핵':420,'바위 껍질':61,'꽃가루':44,'망령의 조각':380};
+const REGIONS=[
+ {name:'❄️ 설원',x:5200,y:100,w:2450,h:1800,color:'#b8dbdc',mark:'#eefbff'},
+ {name:'🏜️ 황금 사막',x:7300,y:1700,w:2450,h:2250,color:'#c8a46d',mark:'#f9dc91'},
+ {name:'🌋 화산 지대',x:6700,y:4350,w:2900,h:2270,color:'#754c4c',mark:'#f48f5d'},
+ {name:'🪷 안개 습지',x:2800,y:3500,w:2750,h:2450,color:'#406b65',mark:'#92d4c7'},
+ {name:'🪨 메아리 협곡',x:2500,y:200,w:2350,h:1400,color:'#a28e81',mark:'#e8c8a1'},
+ {name:'🌸 벚꽃 언덕',x:850,y:3650,w:1700,h:2000,color:'#9c8599',mark:'#f5c6dc'}
+];
+const UPGRADE_TIER=[null,{item:'토끼 간',qty:2,gold:60,rate:.95},{item:'버섯 포자',qty:3,gold:155,rate:.8},{item:'고블린 이빨',qty:3,gold:420,rate:.65},{item:'마력 광석',qty:3,gold:1050,rate:.52},{item:'용의 비늘',qty:2,gold:2500,rate:.38}];
+const equipmentUpgrade=name=>Math.max(0,Math.min(5,Number(player?.weaponUpgrades?.[name])||0));
+const upgradeBonus=name=>{const base=WEAPONS.find(w=>w.name===name)?.atk||0;return Math.round((base*0.22+3)*equipmentUpgrade(name));};
+const SIDE_QUESTS=[
+{id:'m2',giver:'mayor',title:'이장의 잃어버린 식량',kind:'collect',item:'토끼 간',count:2,min:2,prereq:'starter',gold:95,xp:115,txt:'토끼 간 2개를 모아 식량 창고를 도와주렴.'},
+{id:'m3',giver:'mayor',title:'이장의 마을 방어',kind:'kill',type:4,count:5,min:3,prereq:'m2',gold:160,xp:190,txt:'마을 밖 이끼 슬라임 5마리를 처치해 주게.'},
+{id:'q1',giver:'hunter',title:'사냥꾼의 첫 의뢰',kind:'kill',type:0,count:5,min:1,gold:65,xp:65,txt:'토끼 숲에 있는 토끼 다섯 마리를 사냥해 줘.'},
+{id:'q2',giver:'herbalist',title:'약초사의 재료 수집',kind:'collect',item:'버섯 포자',count:3,min:2,gold:135,xp:145,txt:'성난 버섯을 잡아 포자 세 개를 가져다줘.'},
+{id:'q3',giver:'courier',title:'수상한 편지',kind:'find',target:'watcher',min:1,gold:85,xp:95,txt:'동쪽 숲의 망루지기를 찾아 편지를 전해 줘.'},
+{id:'q4',giver:'watcher',title:'망루 수호 임무',kind:'kill',type:2,count:4,min:4,gold:195,xp:225,txt:'고블린 네 마리를 처리해 줘.'},
+{id:'q5',giver:'fisher',title:'강가의 녹색 소동',kind:'kill',type:4,count:6,min:2,gold:115,xp:120,txt:'강가의 슬라임 여섯 마리를 잡아 줘.'},
+{id:'q6',giver:'blacksmith',title:'대장장이의 연구',kind:'collect',item:'고블린 이빨',count:3,min:5,gold:260,xp:240,txt:'고블린 이빨 세 개로 새 무기를 연구할 거야.'},
+{id:'q7',giver:'ranger',title:'멧돼지 저지선',kind:'kill',type:5,count:5,min:7,gold:260,xp:260,txt:'남쪽 숲의 멧돼지 다섯 마리를 처치해 줘.'},
+{id:'q8',giver:'scholar',title:'고대의 증표',kind:'collect',item:'마력 광석',count:2,min:16,gold:680,xp:650,txt:'먼 유적에서 마력 광석 두 개를 구해 와.'},
+{id:'q9',giver:'scout',title:'정찰병의 연락',kind:'find',target:'hermit',min:5,gold:200,xp:210,txt:'서쪽 먼 바위산에 있는 은둔자를 찾아줘.'},
+{id:'q10',giver:'hermit',title:'늑대의 밤',kind:'kill',type:3,count:4,min:10,gold:370,xp:380,txt:'깊은 숲에서 혼돈의 늑대 네 마리를 처치해.'},
+{id:'q11',giver:'miner',title:'광부의 안전 확보',kind:'kill',type:6,count:3,min:17,gold:730,xp:720,txt:'고대 골렘 세 마리를 처치해서 광산 길을 열어줘.'},
+{id:'q12',giver:'knight',title:'성벽의 검은 그림자',kind:'kill',type:7,count:6,min:13,gold:440,xp:475,txt:'어둠 까마귀 여섯 마리를 쫓아내 줘.'},
+{id:'q13',giver:'alchemist',title:'연금술의 마지막 조각',kind:'collect',item:'용의 비늘',count:1,min:25,gold:1400,xp:1100,txt:'푸른 드레이크의 비늘 한 개가 필요해.'},
+{id:'q14',giver:'traveler',title:'사막을 건너온 소식',kind:'find',target:'miner',min:6,gold:265,xp:290,txt:'북쪽의 먼 광산에 있는 광부에게 소식을 전해 줘.'},
+{id:'q15',giver:'guard',title:'경비대 훈련',kind:'kill',type:1,count:6,min:2,gold:155,xp:155,txt:'버섯 여섯 마리를 처치하며 전투를 익혀.'},
+{id:'q16',giver:'poet',title:'떠돌이 시인의 부탁',kind:'find',target:'bard',min:1,gold:100,xp:130,txt:'마을의 음유시인을 찾아 내 노래를 전해 줘.'}
+];
+const QUEST_NPCS=[
+['hunter','토끼 사냥꾼',1150,480,'#a6dc92'],['herbalist','숲의 약초사',1580,1460,'#9cd3b6'],['courier','우편 배달부',440,820,'#ffcc92'],['watcher','동쪽 망루지기',2760,1000,'#c0d8f9'],
+['fisher','강가 어부',2180,2100,'#7acbd8'],['blacksmith','산골 대장장이',3350,1180,'#f1b185'],['ranger','숲길 순찰자',3850,3220,'#88d0a0'],['scholar','유적 연구자',6220,4850,'#c6bbfc'],
+['scout','북부 정찰병',4800,1350,'#f2d19d'],['hermit','바위산 은둔자',900,5100,'#baa0e5'],['miner','먼 광산 광부',7530,1050,'#9faec2'],['knight','성벽 기사',8280,3890,'#c8cfe7'],
+['alchemist','황혼 연금술사',9050,5700,'#dfb9e3'],['traveler','먼 길 여행자',3650,4650,'#e7bc82'],['guard','마을 경비병',570,600,'#85bce5'],['poet','떠돌이 시인',1160,2600,'#e5a4c9']
+];QUEST_NPCS.forEach(([id,name,x,y,color])=>NPCS.push({id:'quest',qid:id,name,x,y,color,icon:'📜'}));
+const WEAPONS=[{name:"맨손",atk:0,price:0},{name:"나무몽둥이",atk:4,price:25},{name:"낡은 단검",atk:7,price:60},{name:"대나무 창",atk:10,price:95},{name:"튼튼한 곤봉",atk:12,price:130},{name:"사냥꾼 활",atk:16,price:210},{name:"청동검",atk:19,price:270},{name:"고블린 단검",atk:23,price:330},{name:"철제 도끼",atk:27,price:440},{name:"쌍날 단검",atk:31,price:530},{name:"견습 마법봉",atk:35,price:650},{name:"강철 장검",atk:42,price:850},{name:"은빛 창",atk:49,price:1150},{name:"화염 단검",atk:56,price:1450},{name:"바람의 활",atk:64,price:1700},{name:"월광의 검",atk:72,price:2000},{name:"번개 지팡이",atk:81,price:2450},{name:"수호자의 창",atk:91,price:2900},{name:"독사의 쌍검",atk:102,price:3500},{name:"고대 골렘 해머",atk:115,price:4300},{name:"얼음 결정검",atk:130,price:5300},{name:"그림자 낫",atk:148,price:6800},{name:"드레이크 검",atk:175,price:9500},{name:"폭풍의 활",atk:198,price:12500},{name:"태양의 대검",atk:225,price:16500},{name:"차원의 지팡이",atk:258,price:22000},{name:"성역의 성창",atk:296,price:29500},{name:"혼돈의 쌍검",atk:338,price:39000},{name:"별빛 심판검",atk:390,price:52000},{name:"왕국의 수호검",atk:460,price:80000}];
+const WEAPON_DROPS={1:['튼튼한 곤봉',.08],2:['고블린 단검',.07],5:['강철 장검',.07],3:['월광의 검',.055],6:['고대 골렘 해머',.05],8:['드레이크 검',.035]};
+const ARMORS=[{name:"천 옷",def:1,price:0,color:"#a9c1ca"},{name:"낡은 여행복",def:2,price:40,color:"#8ba99b"},{name:"가죽 조끼",def:4,price:90,color:"#ab865e"},{name:"누비 갑옷",def:6,price:150,color:"#b8a489"},{name:"견고한 가죽갑옷",def:9,price:260,color:"#7a593f"},{name:"사냥꾼 망토",def:12,price:390,color:"#658b64"},{name:"청동 흉갑",def:14,price:510,color:"#b77c58"},{name:"철제 갑옷",def:17,price:680,color:"#a7b5cb"},{name:"숲의 수호복",def:21,price:930,color:"#6caa76"},{name:"은사슬 갑옷",def:25,price:1250,color:"#b3bcc8"},{name:"기사의 판금갑옷",def:29,price:1600,color:"#cdd6e8"},{name:"화염 저항복",def:34,price:2100,color:"#cc7653"},{name:"서리 망토",def:40,price:2800,color:"#83bfd1"},{name:"마력 수호복",def:48,price:3500,color:"#ac8ee9"},{name:"바위거인 갑옷",def:57,price:4800,color:"#a4a198"},{name:"황금기사 갑옷",def:67,price:6500,color:"#e5c36e"},{name:"용비늘 갑옷",def:78,price:8500,color:"#8dced8"},{name:"암영 전투복",def:91,price:11000,color:"#655c8e"},{name:"폭풍의 흉갑",def:106,price:14500,color:"#78a9d5"},{name:"태양의 갑옷",def:124,price:19500,color:"#f6be67"},{name:"고대 왕실 갑옷",def:145,price:26000,color:"#d3a4c5"},{name:"별빛 수호복",def:171,price:34500,color:"#a1b6fa"},{name:"불멸의 판금",def:205,price:46000,color:"#b7d5de"},{name:"차원 장막",def:244,price:61000,color:"#aa87ef"},{name:"혼돈의 갑옷",def:292,price:80000,color:"#b77aa9"},{name:"신화의 성갑",def:350,price:110000,color:"#ffe2a0"}];
+const armorDef=()=>ARMORS.find(a=>a.name===player?.armor)?.def||0;
+const weaponAtk=()=> (WEAPONS.find(w=>w.name===player?.weapon)?.atk||0)+upgradeBonus(player?.weapon);
+const attackStat=()=>5+(player.lv-1)*3+weaponAtk()+player.stage*17;
+const completedQuest=id=>id==='starter'?player.quests.starter.state==='done':player.sideQuests?.[id]?.state==='done';
+function questTalk(id){let options=SIDE_QUESTS.filter(q=>q.giver===id);const active=options.find(q=>player.sideQuests[q.id]?.state==='active');const available=options.find(q=>!player.sideQuests[q.id]||player.sideQuests[q.id].state==='available');const q=active||available;if(!q){showDialog('📜 의뢰 게시판','현재 맡길 수 있는 일은 모두 끝났어! 멋진 모험가로군.',[['다음에 또 올게요',closeDialog]]);return}
+let progress=player.sideQuests[q.id]||{state:'available',count:0};if(progress.state!=='active'){
+if(q.prereq&&!completedQuest(q.prereq)){showDialog('📜 '+q.title,'먼저 앞선 임무를 마쳐야 해.',[['알겠어요',closeDialog]]);return}
+if(player.lv<q.min){showDialog('📜 '+q.title,`이 임무는 Lv.${q.min} 이상에게 부탁하고 있어. 지금은 Lv.${player.lv}이네.`,[['더 강해져서 돌아올게요',closeDialog]]);return}
+showDialog('📜 '+q.title,`${q.txt}<br><br>보상: <b class="gold">${q.gold}G · ${q.xp} 경험치</b>`,[['퀘스트 수락',()=>{player.sideQuests[q.id]={state:'active',count:0};log('📜 '+q.title+' 수락');closeDialog();save()}],['나중에 할게요',closeDialog]]);return}
+let done=q.kind==='kill'?progress.count>=q.count:q.kind==='collect'?(player.inventory[q.item]||0)>=q.count:progress.count>=1;
+if(!done){let txt=q.kind==='kill'?`${ENEMY_TYPES[q.type].name} ${progress.count}/${q.count}`:q.kind==='collect'?`${q.item} ${player.inventory[q.item]||0}/${q.count}`:`${NPCS.find(n=>n.qid===q.target||n.id===q.target)?.name||'목표 NPC'}를 찾아 대화하기`;showDialog('📜 '+q.title,'아직 임무가 끝나지 않았어.<br>'+txt,[['계속 해볼게요',closeDialog]]);return}
+showDialog('✨ '+q.title,'정말 잘했어! 고생한 만큼 보상을 받아 가렴.',[['보상 받기',()=>{if(q.kind==='collect')player.inventory[q.item]-=q.count;player.sideQuests[q.id].state='done';player.gold+=q.gold;gainXp(q.xp);log(`✅ ${q.title} 완료! ${q.gold}G +${q.xp}XP`);closeDialog();toast('🎉 퀘스트 완료!');save()}],['잠시 후에 받을게요',closeDialog]])}
+function questDiscover(n){for(const q of SIDE_QUESTS){if(q.kind!=='find'||q.target!==(n.qid||n.id))continue;let state=player.sideQuests?.[q.id];if(state?.state==='active'&&state.count===0){state.count=1;toast('📨 전달 완료! 의뢰인에게 돌아가 보상을 받아!');log(q.title+': 목표 발견');save()}}}
+
+function spawnEnemies(){
+  enemies=[];
+  // Each group occupies a broad habitat. Individual monsters also have their own
+  // invisible home-centered leash; no rings/lines are drawn in the game or minimap.
+  const areas=[
+    {type:0,x1:650,x2:1070,y1:170,y2:740,n:22,r:120},
+    {type:9,x1:1140,x2:1650,y1:770,y2:1250,n:12,r:115},
+    {type:4,x1:1670,x2:2400,y1:770,y2:1400,n:22,r:135},
+    {type:1,x1:1350,x2:2200,y1:1550,y2:2300,n:22,r:145},
+    {type:10,x1:2270,x2:2830,y1:1550,y2:2370,n:13,r:135},
+    {type:2,x1:2850,x2:3550,y1:950,y2:1630,n:24,r:150},
+    {type:20,x1:3660,x2:4640,y1:400,y2:1250,n:15,r:150},
+    {type:5,x1:3000,x2:3850,y1:2740,y2:3570,n:23,r:165},
+    {type:3,x1:4210,x2:5100,y1:2800,y2:3700,n:24,r:185},
+    {type:7,x1:5630,x2:6570,y1:2700,y2:3600,n:21,r:160},
+    {type:6,x1:5890,x2:6650,y1:3910,y2:4650,n:21,r:165},
+    {type:8,x1:7910,x2:8840,y1:5170,y2:5950,n:15,r:170},
+    {type:11,x1:3410,x2:4090,y1:3890,y2:4650,n:15,r:145},
+    {type:16,x1:4180,x2:4930,y1:4550,y2:5290,n:14,r:140},
+    {type:17,x1:4890,x2:5540,y1:5410,y2:5960,n:13,r:125},
+    {type:12,x1:7840,x2:8500,y1:2110,y2:2730,n:15,r:135},
+    {type:13,x1:8620,x2:9350,y1:2900,y2:3680,n:13,r:150},
+    {type:14,x1:5280,x2:5990,y1:320,y2:1070,n:15,r:150},
+    {type:15,x1:6370,x2:7130,y1:750,y2:1470,n:15,r:155},
+    {type:18,x1:6950,x2:7640,y1:4770,y2:5390,n:14,r:145},
+    {type:19,x1:7890,x2:8580,y1:6090,y2:6590,n:11,r:135},
+    {type:21,x1:1510,x2:2250,y1:4250,y2:4920,n:15,r:140},
+    {type:22,x1:5570,x2:6360,y1:5050,y2:5680,n:12,r:155}
+  ];  areas.forEach(a=>{for(let i=0;i<a.n;i++){
+    const x=rand(a.x1,a.x2),y=rand(a.y1,a.y2),t=ENEMY_TYPES[a.type];
+    const radius=a.r*rand(.75,1.2);
+    enemies.push({x,y,homeX:x,homeY:y,roamRadius:radius,type:a.type,
+      lv:t.lv,hp:t.hp,maxHp:t.hp,atkAt:0,wander:rand(-5,5),alive:true,
+      respawn:0,flash:0,zone:{x1:a.x1,x2:a.x2,y1:a.y1,y2:a.y2}});
+  }});
+  enemies.push({x:1900,y:935,homeX:1900,homeY:935,roamRadius:230,type:6,
+    lv:32,hp:1500,maxHp:1500,atkAt:0,wander:0,alive:true,respawn:0,
+    boss:true,flash:0,zone:{x1:1600,x2:2300,y1:700,y2:1450}});
+}
+// Hard movement leash is strictly invisible (world map, minimap, and game field).
+function confineEnemy(e){
+  const r=e.roamRadius||150;
+  let dx=e.x-e.homeX,dy=e.y-e.homeY,d=Math.hypot(dx,dy);
+  if(d>r){e.x=e.homeX+dx/d*r;e.y=e.homeY+dy/d*r;}
+  e.x=clamp(e.x,e.zone.x1,e.zone.x2);
+  e.y=clamp(e.y,e.zone.y1,e.zone.y2);
+}
+
+function createPlayer(nick,job=-1){return {nick,job,lv:1,x:340,y:355,mapExpanded3x:true,hp:105,maxHp:105,mp:75,maxMp:75,xp:0,gold:45,potions:4,kills:0,weapon:null,armor:null,armors:[],stage:0,specialization:null,finalJob:null,completed:[],quests:{starter:{state:'unstarted',count:0},advance1:{state:'locked',count:0},advance2:{state:'locked',count:0}},flags:{intro:false,forest:false,acceptedBoss:false,boss:false},lastAttack:0,skillAt:[0,0,0],direction:1,abilityShards:0,hidden:false,learnedSkills:[],skillSlots:[null,null,null,null,null],skillTraining:null,weaponUpgrades:{},evolvedSkills:[],fusedSkills:[],path:'',storyChoices:[],rested:0,inventory:{'토끼 간':0,'화살':0},sideQuests:{},weapons:['맨손'],appearance:{skin:'#e4b78d',hair:'#2c2330',shirt:'#78c7fa',pants:'#29364b',hairStyle:0}}}
+// The world is 3x larger in BOTH directions; keep the village at the original spawn.
+const MAP_SCALE=3,MAP_ANCHOR={x:340,y:355};
+function scaleMapPoint(x,y){return {x:MAP_ANCHOR.x+(x-MAP_ANCHOR.x)*MAP_SCALE,y:MAP_ANCHOR.y+(y-MAP_ANCHOR.y)*MAP_SCALE}}
+function expandMapEntities(){
+ // The immediate village remains walkable and familiar, while all remote points spread out.
+ for(const npc of NPCS){if(npc.id==='mayor'||npc.id==='merchant'||npc.id==='weaponseller'||npc.id==='armorseller'||npc.id==='junkdealer'||npc.id==='forge'||npc.id==='trainer')continue;
+  const v=scaleMapPoint(npc.x,npc.y);npc.x=v.x;npc.y=v.y;
+ }
+ for(const r of REGIONS){const v=scaleMapPoint(r.x,r.y);r.x=v.x;r.y=v.y;r.w*=MAP_SCALE;r.h*=MAP_SCALE}
+ for(const e of enemies){const center=scaleMapPoint(e.x,e.y);e.x=e.homeX=center.x;e.y=e.homeY=center.y;
+  let z=e.zone;z.x1=scaleMapPoint(z.x1,0).x;z.x2=scaleMapPoint(z.x2,0).x;
+  z.y1=scaleMapPoint(0,z.y1).y;z.y2=scaleMapPoint(0,z.y2).y;
+  e.roamRadius*=MAP_SCALE;
+ }
+}
+function confirmResign(){
+ if(!player)return;
+ if(player.job<0||player.stage===0){showDialog('⚠️ 직업 포기', '아직 전직한 직업이 없어 포기할 수 없어. 전직 후에는 =키를 세 번 누르고 확인창에서 직업 포기를 선택할 수 있어.', [['확인',closeDialog]]);return}
+ const title=player.finalJob||player.specialization||JOBS[player.job]?.[0]||'현재 직업';
+ showDialog('⚠️ 정말 직업을 포기할까?',`<b>${title}</b>을 포기하면 <b style="color:#ff9b9b">배웠던 직업 스킬 전부, 스킬 슬롯, 전직 단계와 진행 중인 스킬 수련</b>이 사라져.<br><br>이 작업은 되돌릴 수 없어. <b>레벨·골드·무기·방어구·다른 퀘스트 기록은 유지</b>돼.`,[['직업 포기',()=>{
+ player.job=-1;player.stage=0;player.specialization=null;player.finalJob=null;player.stage2SkillsLearned=false;
+ player.learnedSkills=[];player.skillSlots=[null,null,null,null,null];player.skillTraining=null;player.skillAt=[0,0,0];player.evolvedSkills=[];player.fusedSkills=[];
+ player.quests.advance1={state:player.lv>=5?'available':'locked',count:0};player.quests.advance2={state:'locked',count:0};
+ selectedBagSkill=null;closeDialog();save();updateHUD();renderBelt();toast('⚠️ 직업을 포기했어. 다시 전직관을 찾아갈 수 있어.');log('직업 포기: 모든 직업 스킬이 삭제됨');
+ }],['취소 · 직업 유지',()=>{closeDialog();toast('직업을 유지했어.')}]]);
+}
+function handleResignPlus(){
+ if(!player||dialogOpen||$('intro').style.display!=='none')return;
+ const now=performance.now();resignPresses=(now-resignLastPress>5000)?1:resignPresses+1;resignLastPress=now;
+ if(resignPresses>=3){resignPresses=0;confirmResign()}else toast(`⚠️ 직업 포기 확인: =키 ${resignPresses}/3 (5초 안에 연속 입력)`);
+}
+function save(show=false){if(!player)return;try{localStorage.setItem(KEY,JSON.stringify(player));if(show)toast('💾 모험이 안전하게 저장됐어!')}catch(e){if(show)toast('저장 실패: 브라우저 저장 공간을 확인해줘')}}
+function load(){try{const data=JSON.parse(localStorage.getItem(KEY));if(data&&typeof data.nick==='string'&&(typeof data.job==='number'||data.job===undefined)){player={...createPlayer(data.nick,data.job),...data,quests:{...createPlayer(data.nick,data.job).quests,...data.quests},flags:{...createPlayer(data.nick,data.job).flags,...data.flags}};player.gold=Math.max(0,Number(player.gold)||0);player.lv=clamp(Math.floor(Number(player.lv)||1),1,MAX_LEVEL);player.xp=player.lv>=MAX_LEVEL?0:Math.max(0,Number(player.xp)||0);player.sideQuests=player.sideQuests||{};player.weaponUpgrades=player.weaponUpgrades||{};player.skillTraining=player.skillTraining||null;player.skillSlots=Array.isArray(player.skillSlots)?player.skillSlots.slice(0,5):[null,null,null,null,null];while(player.skillSlots.length<5)player.skillSlots.push(null);player.learnedSkills=Array.isArray(player.learnedSkills)?player.learnedSkills:[];player.weapons=player.weapons||['맨손',...(player.weapon?[player.weapon]:[])];player.armors=Array.isArray(player.armors)?player.armors:[];player.armor=ARMORS.some(a=>a.name===player.armor)?player.armor:null;player.inventory={ '토끼 간':0,'화살':0,...(player.inventory||{}) };player.appearance={skin:'#e4b78d',hair:'#2c2330',shirt:'#78c7fa',pants:'#29364b',hairStyle:0,...(player.appearance||{})};if(!data.mapExpanded3x){if(player.x>760||player.y>780){const moved=scaleMapPoint(player.x,player.y);player.x=moved.x;player.y=moved.y}player.mapExpanded3x=true}player.x=clamp(player.x,25,worldWidth-25);player.y=clamp(player.y,25,worldHeight-25);return true}}catch(e){}return false}
+function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400)}function log(msg){let el=$('log'),n=document.createElement('div');n.textContent='✦ '+msg;el.prepend(n);while(el.children.length>9)el.lastChild.remove()}
+function particle(x,y,color,n=9,size=5){for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-140,140),vy:rand(-150,65),life:rand(.35,.85),max:.85,color,size:rand(2,size)})}function floatText(x,y,t,c='#ffe3a1'){floats.push({x,y,text:t,life:1,color:c})}
+function gainXp(v){if(!player)return;if(player.lv>=MAX_LEVEL){player.xp=0;return}player.xp+=v;let ups=0;while(player.lv<MAX_LEVEL&&player.xp>=xpRequired(player.lv)){player.xp-=xpRequired(player.lv);player.lv++;ups++;player.maxHp+=15;player.maxMp+=7;player.hp=player.maxHp;player.mp=player.maxMp;particle(player.x,player.y,'#ffd77d',35);log(`레벨 ${player.lv} 달성! 공격력 +3 · 최대 체력 +15 · 마력 +7`)}if(player.lv>=MAX_LEVEL)player.xp=0;if(ups)toast(`⭐ 레벨 UP! Lv.${player.lv}`);if(player.lv>=5&&player.stage===0&&player.quests.advance1.state==='locked'){player.quests.advance1.state='available';toast('🧙 5레벨 달성! 먼 지역의 전직관을 찾아 전직 퀘스트를 받아!')}if(player.lv>=30&&player.stage===1&&player.quests.advance2.state==='locked'){player.quests.advance2.state='available';toast('👑 30레벨 달성! 자신의 전직관에게 2차 전직 퀘스트를 받아!')}}
+function questKilled(t){if(player.skillTraining&&player.skillTraining.target===t){player.skillTraining.count=Math.min(player.skillTraining.need,player.skillTraining.count+1);if(player.skillTraining.count===player.skillTraining.need)toast('📖 스킬 수련 완료! 담당 전직관에게 돌아가!')}for(const q of SIDE_QUESTS){if(q.kind==='kill'&&q.type===t&&player.sideQuests[q.id]?.state==='active')player.sideQuests[q.id].count=Math.min(q.count,(player.sideQuests[q.id].count||0)+1)}let q=player.quests.starter;if(q.state==='active'&&player.weapon==='나무몽둥이'&&t===0)q.count++;let a=player.quests.advance1;if(a.state==='active'&&(t===a.target))a.count++;let b=player.quests.advance2;if(b.state==='active'&&(t===b.target))b.count++;}
+function killEnemy(e){e.alive=false;e.respawn=e.boss?1e12:rand(12,23);player.kills++;
+const t=e.boss?{xp:700,gold:850,color:'#ffcb77'}:ENEMY_TYPES[e.type];
+if(!e.boss&&t.loot&&Math.random()<t.chance){player.inventory[t.loot]=(player.inventory[t.loot]||0)+1;floatText(e.x,e.y-28,`🎒 ${t.loot} +1`,'#ffda9c');log('🎁 '+t.loot+' 획득!')}
+if(!e.boss&&WEAPON_DROPS[e.type]&&Math.random()<WEAPON_DROPS[e.type][1]){let w=WEAPON_DROPS[e.type][0];if(!player.weapons.includes(w))player.weapons.push(w);floatText(e.x,e.y-56,'⚔️ '+w,'#f7d882');log('✨ 희귀 무기 발견: '+w);toast('⚔️ 새 무기 '+w+'! 인벤토리에서 장착해!')}
+player.gold+=t.gold;gainXp(t.xp);questKilled(e.type);particle(e.x,e.y,t.color,26);floatText(e.x,e.y,`+${t.xp} XP / ${t.gold}G`);
+if(e.boss){player.flags.boss=true;log('혼돈의 수호자를 무찔렀다!');showDialog('왕국의 운명','왕국의 시계가 다시 움직인다! 수호자는 마지막으로 네게 묻는다. 왕국을 위해 힘을 사용할 것인가?',[['왕국을 구한다',()=>ending('영웅의 결말')],['내 길을 간다',()=>ending('방랑자의 결말')]])}}
+
+function ending(which){player.flags.ending=which;player.storyChoices.push(which);log('🎉 '+which+' 달성!');save();showDialog('🎉 '+which,`축하해, ${player.nick}! 왕국의 첫 이야기를 마쳤어. 하지만 새로운 전직과 더 깊은 던전은 계속 기다리고 있지.`,[['모험 계속하기',closeDialog]])}
+function damageEnemy(e,dmg,color='#ffe0a0'){if(!e.alive)return;const levelGap=Math.max(0,e.lv-player.lv);const equipmentBonus=weaponAtk();const penalty=Math.min(.88,levelGap*.11)*Math.max(.15,1-equipmentBonus/95);dmg=Math.max(1,Math.round(dmg*(1-penalty)));e.hp=Math.max(0,e.hp-dmg);e.flash=.12;floatText(e.x,e.y,`-${dmg}`,color);particle(e.x,e.y,color,6);if(e.hp<=0)killEnemy(e)}
+const VILLAGE_RESPAWN={x:340,y:355};
+function monsterAttack(e,t){
+  // Every monster gains damage as its own level rises. Higher-level enemies also
+  // punish underleveled adventurers; strong armor still mitigates the hit.
+  const base=t.atk||5;
+  const levelPower=Math.max(0,e.lv-1)*1.65;
+  const dangerBonus=Math.max(0,e.lv-player.lv)*1.2;
+  const bossBonus=e.boss?Math.round(e.lv*.85):0;
+  return Math.max(1,Math.round(base+levelPower+dangerBonus+bossBonus));
+}
+function respawnAtVillage(){
+  player.x=VILLAGE_RESPAWN.x;
+  player.y=VILLAGE_RESPAWN.y;
+  player.hp=player.maxHp;
+  player.mp=player.maxMp;
+  player.reviveProtection=performance.now()+2500;
+  player.gold=Math.max(0,player.gold);
+  for(const e of enemies){e.atkAt=performance.now();}
+  particle(player.x,player.y,'#97f1cf',45);
+  toast('💚 마을에서 부활! 체력과 마력이 회복됐어.');
+  log('💀 쓰러져 마을의 시작 지점에서 다시 태어났다.');
+  save();
+}
+function damagePlayer(d){if(!player||player.hp<=0||returnHeld||performance.now()<(player.reviveProtection||0))return;d=Math.max(1,Math.round(d*(100/(100+armorDef()*7))));player.hp=Math.max(0,player.hp-d);particle(player.x,player.y,'#ff717d',7);floatText(player.x,player.y,`-${d}`,'#ff9b9b');if(player.hp<=0)respawnAtVillage()}
+function nearestEnemy(max=240){let best=null,bd=max;for(const e of enemies){if(!e.alive)continue;let d=dist(player,e);if(d<bd){bd=d;best=e}}return best}
+function attack(){
+ if(!player||dialogOpen||returnHeld)return;
+ const now=performance.now();if(now-player.lastAttack<330)return;
+ const bow=/활|석궁/.test(player.weapon||'');
+ if(bow && (player.inventory['화살']||0)<=0){toast('🏹 화살이 없어! 마을 잡화상인에게서 구매해.');return}
+ const ranged=bow||[1,2,7,9,10,11].includes(player.job),range=ranged?250:135;
+ const e=nearestEnemy(range);
+ if(!e){toast('공격 범위 안에 몬스터가 없어!');return}
+ player.lastAttack=now;
+ if(bow){player.inventory['화살']--;save();}
+ player.direction=e.x>=player.x?1:-1;
+ particle(player.x+player.direction*25,player.y-8,bow?'#e5c58d':(player.job>=0?JOBS[player.job][3]:'#78c7fa'),9);
+ const dmg=Math.round(attackStat()+rand(0,8));
+ if(ranged){let delta=dist(player,e)||1;projectiles.push({x:player.x,y:player.y,vx:(e.x-player.x)/delta*620,vy:(e.y-player.y)/delta*620,life:.7,color:bow?'#f4c66c':(player.job>=0?JOBS[player.job][3]:'#78c7fa'),target:e,dmg})}
+ else damageEnemy(e,dmg);
+ log(`${bow?'🏹 화살':(player.job>=0?JOBS[player.job][0]:'초보 모험가')+'의 공격'}! ${dmg} 피해${bow?' · 남은 화살 '+player.inventory['화살']+'개':''}`);
+}
+function useSkill(slot){if(!player||dialogOpen||returnHeld)return;
+ const slots=player.skillSlots||[];let assigned=slots[slot];
+ if(!assigned){toast('🎒 비어 있는 스킬 칸이야. B 배낭에서 스킬을 장착해!');return}
+ const i=player.job>=0?CAREER_SKILLS[player.job].indexOf(assigned):-1;
+ if(i<0 || !(player.learnedSkills||[]).includes(assigned)){toast('아직 배운 기술이 아니야!');return}
+ const now=performance.now(),cost=[13,26,40][i],cool=[3.8,7.5,13][i];if(player.mp<cost){toast('💠 마력이 부족해!');return}if(now-player.skillAt[i]<cool*1000){toast(`⏳ ${Math.ceil(cool-(now-player.skillAt[i])/1000)}초 뒤에 사용할 수 있어`);return}player.skillAt[i]=now;player.mp-=cost;motionFX.push({x:player.x,y:player.y,at:now,kind:i,job:player.job,color:player.job>=0?JOBS[player.job][3]:['#9cddff','#e1adff','#ffe399'][i],trainer:false});for(let burst=0;burst<3;burst++){let a=burst*Math.PI*2/3;motionFX.push({x:player.x+Math.cos(a)*(35+i*12),y:player.y+Math.sin(a)*(35+i*12),at:now+burst*65,kind:i,job:player.job,color:JOBS[player.job][3],trainer:false})}let radius=[155,205,280][i],power=Math.round((25+i*24)+player.lv*(3+i)+player.stage*(12+i*13)),found=0;for(const e of enemies){if(e.alive&&dist(player,e)<radius){damageEnemy(e,power,'#9ed8ff');found++}}particle(player.x,player.y,player.stage>=1?JOBS[player.job][3]:['#8fd3ff','#f6b2ff','#ffdc75'][i],i===2?70:40,8);if(player.stage>=1&&player.job===13){player.hp=Math.min(player.maxHp,player.hp+Math.round(player.maxHp*(.1+i*.09)));floatText(player.x,player.y-55,'💚 강화 · 회복!','#98fbd1')}if(player.stage>=1&&player.job===12){let target=nearestEnemy(300);if(target){damageEnemy(target,Math.round(power*.55),'#9cfdc1');floatText(target.x,target.y-65,'🐾 소환수 공격!','#b5ffce')}}if(player.stage>=1&&player.job===3){let target=nearestEnemy(radius);if(target&&Math.random()<.5)damageEnemy(target,Math.round(power*.5),'#edb9fc')}floatText(player.x,player.y-96,'✦ '+assigned,JOBS[player.job][3]);log(`${JOBS[player.job][0]} · ${assigned} 발동! (${found}명 타격)`);if(i===1&&[4,7,9].includes(player.job)){player.hp=Math.min(player.maxHp,player.hp+25+player.lv*2);floatText(player.x,player.y,'회복!','#a1ffb2')}if(i===2){for(const e of enemies){if(e.alive&&dist(e,player)<radius)e.wander+=2}}if(found===0)toast('✨ 기술 발동! 주변에 적이 없어')}
+function skillName(i){if(player.stage>=1&&player.job>=0&&CAREER_SKILLS[player.job]&&Array.isArray(player.learnedSkills)&&player.learnedSkills.includes(CAREER_SKILLS[player.job][i]))return CAREER_SKILLS[player.job][i];return ['초보자의 일격','초보자의 돌풍','초보자의 기합'][i]}
+function heal(){if(player.potions<=0){toast('물약이 없어! 상인에게 구매해');return}if(player.hp>=player.maxHp){toast('이미 체력이 가득해!');return}player.potions--;player.hp=Math.min(player.maxHp,player.hp+Math.round(player.maxHp*.55));particle(player.x,player.y,'#80edaa',20);toast('🧪 체력을 회복했어!')}
+function showDialog(title,html,opts){dialogOpen=true;$('dialog').style.display='block';$('dialogTitle').textContent=title;$('dialogText').innerHTML=html;const c=$('dialogChoices');c.replaceChildren();for(const [txt,fn] of opts){let b=document.createElement('button');b.textContent=txt;b.onclick=()=>{if(fn)fn()};c.append(b)}if(!opts.length){let b=document.createElement('button');b.textContent='닫기';b.onclick=closeDialog;c.append(b)}}function closeDialog(){dialogOpen=false;$('dialog').style.display='none'}
+function talk(){if(dialogOpen){closeDialog();return}let nearest=null,d=125;for(const n of NPCS){let dd=dist(player,n);if(dd<d){d=dd;nearest=n}}if(!nearest){toast('💬 대화할 NPC에게 가까이 다가가!');return}questDiscover(nearest);if(nearest.id==='quest')questTalk(nearest.qid);if(nearest.id==='mayor')mayor();if(nearest.id==='trainer')trainer(nearest.job);if(nearest.id==='merchant')merchant();if(nearest.id==='junkdealer')junkDealer();if(nearest.id==='forge')forgeMenu();if(nearest.id==='weaponseller')openShop('weapon');if(nearest.id==='armorseller')openShop('armor');if(nearest.id==='bard')bard();if(nearest.id==='master')master()}
+function mayor(){const q=player.quests.starter;if(q.state==='unstarted'){
+showDialog('마을 이장','아이고, 드디어 모험가가 왔구나! 맨손으로 토끼를 상대할 순 없지. 내 창고에 있던 <b>나무몽둥이</b>를 가져가거라. 초원의 토끼 3마리를 처치한 뒤 다시 찾아오너라.',[['나무몽둥이 받기 🪵',()=>{player.weapon='나무몽둥이';if(!player.weapons.includes('나무몽둥이'))player.weapons.push('나무몽둥이');q.state='active';q.count=0;player.flags.intro=true;particle(player.x,player.y,'#efc38a',28);log('🪵 이장에게서 나무몽둥이를 받았다!');toast('🪵 나무몽둥이 장착! 마우스 좌클릭으로 근처 토끼 공격');closeDialog();save()}],['잠시 후에 올게요',closeDialog]]);return}
+if(q.state==='active'){if(q.count>=3){q.state='done';player.gold+=100;gainXp(130);log('첫 모험 완료! 보상 100G와 경험치 130');showDialog('마을 이장','세상에! 토끼 세 마리를 모두 잡았구나! 첫 임무를 잘해 냈어. <b class="gold">100G + 경험치 130</b> 획득!',[['마을을 지키겠어!',()=>{player.path='hero';player.storyChoices.push('마을을 지키겠다');closeDialog();save()}],['더 큰 보물을 찾을래!',()=>{player.path='fortune';player.storyChoices.push('보물을 찾아 떠난다');closeDialog();save()}]])}else showDialog('마을 이장',`나무몽둥이는 잘 쓰고 있느냐? 마을 동쪽 초원의 <b>토끼 3마리</b>를 처치하고 돌아오너라. (${q.count}/3)`,[['알겠어요!',closeDialog],['토끼가 너무 빨라요!',()=>showDialog('마을 이장','토끼에게 다가가 마우스 좌클릭으로 공격해 보거라. 숫자 1, 2, 3으로 기술도 쓸 수 있단다!',[['가볼게요!',closeDialog]])]]);return}
+if(!completedQuest('m3')){questTalk('mayor');return}showDialog('마을 이장',`역시 ${player.nick}! 나무몽둥이를 소중하게 써 주렴. 5레벨이 되면 각 지역의 <b>전직관</b>를 만나 특별한 퀘스트에 도전할 수 있단다.`,[['고마워요, 이장님!',closeDialog]])}
+const CAREER_SKILLS=[
+ ['강철 베기','회전 참격','불굴의 의지'],['마력탄','불꽃 폭풍','원소 폭발'],['정조준','화살비','매의 눈'],['급습','그림자 난무','암살의 일격'],
+ ['빛의 심판','치유의 기도','신성 영역'],['권풍','연격','투신의 기합'],['꿰뚫기','창의 회오리','용의 창'],['정령탄','정령의 합창','대정령 폭주'],
+ ['산성탄','연금 폭발','현자의 비약'],['음파검','전장의 선율','영웅의 노래'],['기계탄','자동 포탑','기계 폭주'],['저주의 손','원혼 폭풍','영혼의 절규'],
+ ['야수의 발톱','늑대 소환','환수의 포효'],['용기의 응원','생명의 축복','전투의 찬가'],['암흑 참격','생명 흡수','심연 강림'],['섬광 검격','검기 폭풍','일섬'],
+ ['덩굴 채찍','정령 소환','숲의 분노'],['환영탄','분신 연격','몽환 결계'],['관통 사격','덫 폭발','최후의 추격'],['부채 일격','검무 회오리','달빛의 춤']
+];
+function demoCareer(jobIndex,level=1){
+ const n=NPCS.find(v=>v.id==='trainer'&&v.job===jobIndex);if(!n)return;
+ const color=JOBS[jobIndex][3], now=performance.now();
+ trainerDemos.push({x:n.x,y:n.y,at:now,color,job:jobIndex,level});motionFX.push({x:n.x,y:n.y,at:now,kind:level===2?2:jobIndex%3,job:jobIndex,color,trainer:true});
+ particle(n.x,n.y,color,95,12);
+ floatText(n.x,n.y-105,'✨ '+CAREER_SKILLS[jobIndex][level===2?2:0],color);
+ log('🎆 '+JOBS[jobIndex][0]+' 전직관이 '+CAREER_SKILLS[jobIndex][level===2?2:0]+' 시범을 보여줬어!');
+}
+function learnOneSkill(jobIndex,skillIndex){
+ const name=CAREER_SKILLS[jobIndex][skillIndex];
+ player.learnedSkills=Array.isArray(player.learnedSkills)?player.learnedSkills:[];
+ if(player.learnedSkills.includes(name))return false;
+ player.learnedSkills.push(name);
+ if(!Array.isArray(player.skillSlots))player.skillSlots=[null,null,null,null,null];
+ // 새로 배운 기술은 보관함에 넣고 플레이어가 슬롯을 직접 지정하도록 한다.
+ particle(player.x,player.y,JOBS[jobIndex][3],45,8);toast('📖 '+name+' 습득! B 배낭에서 슬롯을 배치해!');
+ log('✨ '+name+' 스킬을 배웠어!');save();return true;
+}
+function skillExam(jobIndex){
+ const known=player.learnedSkills||[],names=CAREER_SKILLS[jobIndex];
+ const idx=names.findIndex(n=>!known.includes(n));
+ if(idx<0){secondAdvancement();return}
+ const target=[0,2,6][idx],need=[0,10,24][idx];
+ const title=names[idx],t=ENEMY_TYPES[target];
+ if(idx===0){showDialog(JOBS[jobIndex][0]+' 전직관',`1차 전직 성공! 이제 첫 기술 <b>${title}</b>을 전수하겠다. 이후의 기술은 더 어려운 수련을 거쳐야 한단다.`,[['첫 스킬 배우기',()=>{learnOneSkill(jobIndex,0);closeDialog()}],['나중에',closeDialog]]);return}
+ const tr=player.skillTraining;
+ if(!tr||tr.job!==jobIndex||tr.index!==idx){showDialog(JOBS[jobIndex][0]+' 전직관',`다음 기술은 <b>${title}</b>.<div class="training">수련 ${idx+1}단계 · 레벨 제한 없음<br><b>${t.name} ${need}마리 처치</b></div>앞의 기술보다 더 힘든 시련이다. 도전하겠느냐?`,[['수련 시작',()=>{player.skillTraining={job:jobIndex,index:idx,target,need,count:0};save();closeDialog();toast('📜 '+title+' 수련 시작!')}],['다음에',closeDialog]]);return}
+ if(tr.count<tr.need){showDialog(JOBS[jobIndex][0]+' 전직관',`<b>${title}</b> 수련이 진행 중이구나.<div class="training">${t.name} 처치: <b>${tr.count}/${tr.need}</b></div>`,[['계속 수련할게요',closeDialog]]);return}
+ demoCareer(jobIndex,idx===2?2:1);
+ showDialog(JOBS[jobIndex][0]+' 전직관',`드디어 수련을 끝냈구나! <b>${title}</b> 기술 시범을 잘 보아라. 이제 배울 준비가 됐다.`,[['스킬 하나 배우기',()=>{learnOneSkill(jobIndex,idx);player.skillTraining=null;save();closeDialog()}],['시범 다시 보기',()=>{demoCareer(jobIndex,idx===2?2:1);closeDialog()}],['나중에 배우기',closeDialog]]);
+}
+function trainerDialogue(jobIndex){const j=JOBS[jobIndex];let q=player.quests.advance1;
+ if(player.lv<5){showDialog(j[0]+' 전직관',`방금 본 기술은 <b>${CAREER_SKILLS[jobIndex][0]}</b>이란다!<br>1차 전직은 <b>5레벨</b>부터 가능해. 지금은 ${player.lv}레벨이구나.`,[['시범 다시 보기',()=>{demoCareer(jobIndex);trainerDialogue(jobIndex)}],['수련하고 올게요',closeDialog]]);return}
+ if(q.state==='active'&&q.job!==jobIndex){showDialog(j[0]+' 전직관','이미 다른 전직 시련을 진행 중이야. 먼저 해당 전직관의 퀘스트를 마쳐 줘.',[['확인',closeDialog]]);return}
+ if(q.state==='available'||q.state==='locked'){const target=jobIndex%3,t=ENEMY_TYPES[target];showDialog(j[0]+' 전직관',`방금 <b>${CAREER_SKILLS[jobIndex][0]}</b> 시범을 봤지? ${j[0]}의 스킬은 <b>${CAREER_SKILLS[jobIndex].join(' · ')}</b>이야.<br><br><b>${t.name} 5마리</b>를 처치한 후 돌아오면 전직에 성공한 뒤 다시 말을 걸면 첫 번째 기술 하나를 가르쳐 주마.<br><span class="muted">담당 직업: ${j[4][0]}</span>`,[['전직 퀘스트 수락',()=>{q.state='active';q.count=0;q.target=target;q.job=jobIndex;log(j[0]+' 전직 퀘스트 시작!');closeDialog();save()}],['시범 다시 보기',()=>{demoCareer(jobIndex);trainerDialogue(jobIndex)}],['다른 직업 둘러보기',closeDialog]]);return}
+ if(q.state==='active'){if(q.count>=5){showDialog(j[0]+' 전직관',`합격이야! <b>${CAREER_SKILLS[jobIndex].join(' · ')}</b> 전직을 마친 뒤 나에게 다시 말을 걸어 기술을 배워라. 전직 후 직업은 바꿀 수 없어.`,[[j[4][0]+'로 전직',()=>{const v=j[4][0];player.job=jobIndex;player.stage=1;player.specialization=v;q.state='done';player.maxHp+=38;player.maxMp+=25;player.hp=player.maxHp;player.mp=player.maxMp;player.gold+=150;gainXp(180);demoCareer(jobIndex);toast("✨ 전직 완료! 전직관에게 다시 E키로 말해 첫 번째 스킬 하나를 배우자!");particle(player.x,player.y,j[3],65);log('✨ '+j[0]+' 1차 전직 완료: '+v);closeDialog();save()}]]);}else showDialog(j[0]+' 전직관',`${ENEMY_TYPES[q.target].name}을 더 처치해야 해. <b>${q.count}/5</b>`,[['시범 다시 보기',()=>{demoCareer(jobIndex);trainerDialogue(jobIndex)}],['수련하고 올게요',closeDialog]]);}
+}
+function trainer(jobIndex){
+ const j=JOBS[jobIndex];
+ if(player.stage>=1 && player.job!==jobIndex){
+  showDialog(j[0]+' 전직관',`나는 <b>${j[4][0]}</b>만 가르친다. 너는 다른 직업의 길을 선택했으니 담당 전직관을 찾아가렴.`,[['확인',closeDialog]]);return;
+ }
+ if(player.stage>=1 && player.job===jobIndex){
+  const known=player.learnedSkills||[];
+  const firstMissing=CAREER_SKILLS[jobIndex].some(k=>!known.includes(k));
+  if(firstMissing){demoCareer(jobIndex,1);skillExam(jobIndex);return}
+  if(player.stage===2 && !player.stage2SkillsLearned){demoCareer(jobIndex,2);showDialog(j[0]+' 전직관','각성 훈련을 마쳤구나! 2차 전직의 힘을 각성시키겠다.',[['각성 완료',()=>{player.stage2SkillsLearned=true;player.maxMp+=20;player.mp=player.maxMp;toast('👑 각성 완료!');closeDialog();save()}],['나중에',closeDialog]]);return}
+  demoCareer(jobIndex,player.stage>=2?2:1);secondAdvancement();return;
+ }
+ demoCareer(jobIndex,1);trainerDialogue(jobIndex);
+}
+function secondAdvancement(){if(player.stage===0){showDialog('전직사','1차 전직도 못한 자가 2차 전직을 원하느냐? 마을 교관을 먼저 찾아가라.',[['돌아간다',closeDialog]]);return}if(player.stage===2){showDialog('전직사',`이미 <b>${player.finalJob}</b>의 경지에 도달했군. 네 앞길에는 아직 수많은 도전이 있다.`,[['계속 모험한다',closeDialog]]);return}if(player.lv<30){showDialog('전직사',`2차 전직은 <b>30레벨</b>에만 가능하다. 지금은 ${player.lv}레벨이군.`,[['다시 오겠습니다',closeDialog]]);return}let q=player.quests.advance2;if(q.state==='available'||q.state==='locked'){showDialog('전직사',`2차 전직 시험: <b>혼돈의 늑대 8마리</b>를 처치하고 돌아와라. 너의 영혼이 진정 강해졌는지 확인하겠다.`,[['시련 수락',()=>{q.state='active';q.target=3;q.count=0;closeDialog();log('👑 2차 전직 시험 시작!');save()}],['준비하고 오겠습니다',closeDialog]])}else if(q.state==='active'){if(q.count>=8)showDialog('전직사',`그대의 용기를 증명했다. <b>${player.specialization}의 각성</b>을 받아들이겠는가?`,[['2차 전직!',()=>{player.stage=2;player.stage2SkillsLearned=false;player.finalJob='각성 '+player.specialization;demoCareer(player.job,2);q.state='done';player.maxHp+=95;player.maxMp+=60;player.hp=player.maxHp;player.mp=player.maxMp;player.gold+=500;gainXp(350);toast("👑 2차 전직 완료! 다시 전직관에게 말을 걸어 각성 기술을 배워!");particle(player.x,player.y,'#ffe3a3',60);log('👑 2차 전직 완료!');closeDialog();save()}],['잠깐만요',closeDialog]]);else showDialog('전직사',`혼돈의 늑대 처치 수: <b>${q.count}/8</b>`,[['수련하러 간다',closeDialog]])}}
+function master(){showDialog('유적 수호자','이 유적의 비밀을 알고 싶다면 마을에서 단련하고 오너라. 전직은 마을의 전직사만 도와줄 수 있다.',[['돌아가기',closeDialog]])}
+function merchant(){showDialog('물약 상인','어서 와! 여긴 물약이 언제나 <b>35G</b>야. <br>체력이 모자라면 물약(H)으로 최대 체력의 55%를 회복할 수 있어.',[['물약 1개 (35G)',()=>buyPotion(1)],['물약 5개 (175G)',()=>buyPotion(5)],['나갈게요',closeDialog]])}function buyPotion(n){if(Math.max(0,player.gold)<n*35){toast('골드가 부족해!');return}player.gold=Math.max(0,player.gold-35*n);player.potions+=n;toast('🧪 물약 '+n+'개 구매!');closeDialog();save()}
+function junkDealer(){
+ const owns=MATERIALS.filter(n=>(player.inventory[n]||0)>0);
+ const rows=owns.map(n=>`<div class="bagItem"><b>${n} × ${player.inventory[n]}</b><small>개당 ${SELL_PRICES[n]}G</small><button data-sell="${MATERIALS.indexOf(n)}">1개 판매</button><button data-sellall="${MATERIALS.indexOf(n)}">모두 판매</button></div>`).join('');
+ const goods=[{count:10,price:25},{count:50,price:110},{count:100,price:200}];
+ const buy=goods.map((g,i)=>`<div class="bagItem"><b>🏹 화살 × ${g.count}</b><small>활·석궁 일반 공격에 한 발씩 소모 · ${g.price}G</small><button data-arrowbuy="${i}" ${player.gold<g.price?'disabled':''}>${player.gold<g.price?'골드 부족':'구매'}</button></div>`).join('');
+ showDialog('🪙 잡화 상인',`<p>어서 와! 활을 쏘려면 화살이 필요해. 화살은 한 발 쏠 때마다 1개씩 소모돼.</p><p>보유 골드: <b class="gold">${player.gold.toLocaleString()}G</b> · 🏹 화살: <b>${player.inventory['화살']||0}개</b></p><h3>🏹 화살 구매</h3><div class="inventoryGrid">${buy}</div><h3>🎁 몬스터 재료 판매</h3><p class="small">강화에 필요한 재료는 남겨 두는 게 좋아!</p><div class="inventoryGrid">${rows||'<p>판매할 재료가 없네.</p>'}</div>`,[['나가기',closeDialog]]);
+ document.querySelectorAll('[data-arrowbuy]').forEach(b=>b.onclick=()=>{const g=goods[Number(b.dataset.arrowbuy)];if(!g||player.gold<g.price)return;player.gold=Math.max(0,player.gold-g.price);player.inventory['화살']=(player.inventory['화살']||0)+g.count;toast(`🏹 화살 ${g.count}발 구매! 현재 ${player.inventory['화살']}발`);log(`잡화상인에게 화살 ${g.count}발 구매 · ${g.price}G`);save();junkDealer()});
+ document.querySelectorAll('[data-sell],[data-sellall]').forEach(b=>b.onclick=()=>{const n=MATERIALS[Number(b.dataset.sell??b.dataset.sellall)];const qty=b.hasAttribute('data-sellall')?player.inventory[n]||0:1;if(!qty||!player.inventory[n])return;player.inventory[n]-=qty;player.gold+=qty*SELL_PRICES[n];toast('🪙 '+n+' '+qty+'개 판매: +'+(qty*SELL_PRICES[n])+'G');save();junkDealer()});
+}
+function forgeMenu(){
+ const wp=(player.weapons||[]).filter(w=>w!=='맨손');
+ const list=wp.map((w,i)=>{const stage=equipmentUpgrade(w),r=UPGRADE_TIER[stage+1];return `<div class="bagItem"><b>⚔️ ${w} ${stage?'+'+stage:''}</b><small>현재 공격력 +${(WEAPONS.find(t=>t.name===w)?.atk||0)+upgradeBonus(w)}</small><small>${r?'다음 강화: '+r.item+' ×'+r.qty+' · '+r.gold+'G · 성공률 '+Math.round(r.rate*100)+'%':'✨ 최대 강화 완료 (+5)'}</small><button data-upgrade="${i}" ${!r?'disabled':''}>${r?'강화 도전':'최대 강화'}</button></div>`}).join('');
+ showDialog('🔨 마을 대장장이',`<p>몬스터에게 얻은 재료로 무기를 <b>최대 +5</b>까지 강화할 수 있어. 성공하면 무기 공격력이 영구적으로 올라가! 강화에 실패하면 재료와 골드는 소모되지만 <b>무기는 파괴되거나 약해지지 않아.</b></p><p class="gold">보유 ${player.gold.toLocaleString()}G</p><div class="inventoryGrid">${list||'먼저 무기를 얻어 와!'}</div>`,[['나중에 올게요',closeDialog]]);
+ document.querySelectorAll('[data-upgrade]').forEach(b=>b.onclick=()=>attemptUpgrade(wp[Number(b.dataset.upgrade)]));
+}
+function attemptUpgrade(name){
+ const stage=equipmentUpgrade(name),r=UPGRADE_TIER[stage+1];if(!r)return;
+ if(player.gold<r.gold||((player.inventory||{})[r.item]||0)<r.qty){toast('🔨 골드 또는 '+r.item+' 재료가 부족해!');return}
+ player.gold=Math.max(0,player.gold-r.gold);player.inventory[r.item]-=r.qty;
+ if(Math.random()<r.rate){player.weaponUpgrades[name]=stage+1;particle(player.x,player.y,'#ffdfa0',65);toast(`✨ 강화 성공! ${name} +${stage+1} · 공격력 증가!`);log('🔨 '+name+' +'+(stage+1)+' 강화 성공!')}else{particle(player.x,player.y,'#aab2bd',25);toast('💨 강화 실패! 무기는 그대로야. 재료와 골드만 소모됐어.');log('🔨 '+name+' 강화 실패')}
+ save();forgeMenu();
+}
+function bard(){showDialog('수다쟁이 음유시인','🎵 땅이 흔들리고 왕의 시계는 멈췄다네~! <br>동쪽 유적의 거대한 수호자를 물리치면 왕국의 첫 이야기가 끝난다네! <br>용감한 모험가가 등장하면 왕국의 운명도 달라진다네!', [['왕국을 구할 거야!',()=>{player.storyChoices.push('왕국의 수호자');player.flags.acceptedBoss=true;log('메인 이야기: 동쪽 유적의 수호자 조사');closeDialog();save()}],['보물만 찾을래!',()=>{player.storyChoices.push('보물 사냥꾼');player.flags.acceptedBoss=true;log('메인 이야기: 동쪽 유적으로 향하기');closeDialog();save()}]])}
+function zone(){for(const r of REGIONS)if(player.x>=r.x&&player.x<=r.x+r.w&&player.y>=r.y&&player.y<=r.y+r.h)return r.name;if(player.x>=600&&player.x<=2500&&player.y>=120&&player.y<=1600)return '🐇 시작의 토끼 숲';if(player.x<750&&player.y<800)return '🏘️ 엉뚱한 마을';if(player.x>4100&&player.y>1800)return '🏛️ 잊힌 황무지';if(player.y>2300)return '🍂 남쪽 붉은 숲';if(player.x>3400)return '⛰️ 먼 산의 땅';if(player.x>1800)return '🌳 깊은 숲';return '🌲 수상한 숲'}
+function updateHUD(){if(!player)return;$('name').textContent=player.nick+' · Lv.'+player.lv;$('level').textContent='⚔️ 공격력 '+attackStat();$('job').textContent=player.finalJob||player.specialization||(player.job>=0?JOBS[player.job][0]:'초보 모험가');$('money').textContent=Math.max(0,player.gold)+' G';$('weapon').textContent='⚔️ 무기: '+(player.weapon||'맨손')+(equipmentUpgrade(player.weapon)?' +'+equipmentUpgrade(player.weapon):'')+' (+'+weaponAtk()+' 공격력)';$('armorHUD').textContent='🛡️ 방어구: '+(player.armor||'없음')+' (방어력 '+armorDef()+')';$('hpText').textContent=`${Math.ceil(player.hp)}/${player.maxHp}`;$('mpText').textContent=`${Math.ceil(player.mp)}/${player.maxMp}`;$('xpText').textContent=player.lv>=MAX_LEVEL?'MAX · Lv.50':`${player.xp}/${xpRequired(player.lv)}`;$('hpBar').style.width=player.hp/player.maxHp*100+'%';$('mpBar').style.width=player.mp/player.maxMp*100+'%';$('xpBar').style.width=(player.lv>=MAX_LEVEL?100:Math.min(100,player.xp/xpRequired(player.lv)*100))+'%';$('potions').textContent=player.potions;$('rabbitLiver').textContent=(player.inventory?.['토끼 간']||0)+'개';$('arrowCount').textContent=(player.inventory?.['화살']||0)+'개';$('kills').textContent='처치 '+player.kills;$('zoneTag').textContent=zone();let q=player.quests,out=[];if(q.starter.state==='active')out.push(`<div class="quest"><strong>🐇 초원의 첫 임무</strong><br>토끼 3마리 처치<div class="progress">${q.starter.count}/3 ${q.starter.count>=3?'· 촌장에게 보고!':''}</div></div>`);if(q.starter.state==='unstarted')out.push('<div class="quest"><strong>🪵 이장의 첫 선물</strong><br>마을 이장에게 말을 걸어 나무몽둥이를 받기</div>');if(player.stage===0)out.push(`<div class="quest"><strong>⚔️ 1차 전직 (Lv.5)</strong><br>${player.lv<5?'5레벨 달성 후 원하는 전직관에게 퀘스트 수락':q.advance1.state==='active'?`${ENEMY_TYPES[q.advance1.target].name} 5마리 처치`: '원하는 전직관에게 퀘스트 수락'}<div class="progress">${q.advance1.state==='active'?q.advance1.count+'/5':'퀘스트 완료 후에만 전직 가능'}</div></div>`);if(player.stage===1)out.push(`<div class="quest"><strong>👑 2차 전직 (Lv.30)</strong><br>${player.lv<30?'레벨 30 달성':q.advance2.state==='active'?'혼돈의 늑대 8마리 처치':'내 직업 전직관에게 퀘스트 수락'}<div class="progress">${q.advance2.state==='active'?q.advance2.count+'/8':'퀘스트 완료 후에만 전직 가능'}</div></div>`);if(player.stage===2)out.push('<div class="quest"><strong>👑 2차 전직 완료!</strong><br>새로운 시련을 기다려!</div>');if(!player.flags.boss)out.push('<div class="quest"><strong>🏰 메인 스토리</strong><br>동쪽 유적의 혼돈 수호자 처치</div>');else out.push('<div class="quest"><strong>🏆 스토리 1장 완료</strong><br>왕국의 시계가 다시 움직여!</div>');if(player.skillTraining){let t=player.skillTraining;out.push(`<div class="quest"><strong>✨ ${CAREER_SKILLS[t.job][t.index]} 수련</strong><br>${ENEMY_TYPES[t.target].name} 처치<div class="progress">${t.count}/${t.need} · ${t.count>=t.need?'전직관에게 보고!':'훈련 중'}</div></div>`)}for(const q of SIDE_QUESTS){const p=player.sideQuests[q.id];if(p?.state!=='active')continue;let d=q.kind==='kill'?`${p.count}/${q.count} 처치`:q.kind==='collect'?`${player.inventory[q.item]||0}/${q.count} 수집`:p.count?'전달 완료!':'대상 NPC 찾기';out.push(`<div class="quest"><strong>📜 ${q.title}</strong><br>${q.txt}<div class="progress">${d} · 의뢰인에게 보고</div></div>`)}$('quests').innerHTML=out.join('');if(!pinnedCollapsed){$('pinnedQuestItems').innerHTML=out.filter(x=>!x.includes('2차 전직 완료!')).slice(0,5).join('')||'<span class="emptyQ">진행 중인 임무가 없어</span>';} $('career').innerHTML=`기본 직업: <b>${(player.job>=0?JOBS[player.job][0]:'초보 모험가')}</b><br>1차: <b>${player.specialization||'Lv.5 이후 전직관 퀘스트'}</b><br>2차: <b>${player.finalJob||'미전직 (Lv.30 + 퀘스트)'}</b>`;let now=performance.now(),cool=[3.8,7.5,13];$('skills').innerHTML=(player.skillSlots||[]).map((name,slot)=>{const idx=player.job>=0?CAREER_SKILLS[player.job].indexOf(name):-1;let sec=idx>=0?Math.max(0,cool[idx]-(now-player.skillAt[idx])/1000):0;return `<div class="skill"><b>${slot+1} · ${name||'빈 슬롯'}</b><br><span class="muted">${idx>=0?([13,26,40][idx]+' MP · '+(sec?sec.toFixed(1)+'초':'사용 가능')):'B 배낭에서 배치'}</span></div>`}).join('');renderBelt()}
+function renderBelt(){if(!player)return;const names=player.skillSlots||[];const now=performance.now();$('skillbelt').innerHTML=names.map((name,slot)=>{const i=player.job>=0?CAREER_SKILLS[player.job].indexOf(name):-1;const remaining=i>=0?Math.max(0,[3.8,7.5,13][i]-(now-player.skillAt[i])/1000):0;return `<button class="beltcell ${!name?'empty':remaining?'cooling':''}" data-belt="${slot}" title="${name||'B 배낭에서 스킬 장착'}"><b>${slot+1}</b><span>${name||'빈 스킬칸'}</span>${remaining?`<span>${remaining.toFixed(1)}초</span>`:''}</button>`}).join('');document.querySelectorAll('[data-belt]').forEach(b=>b.onclick=()=>useSkill(Number(b.dataset.belt)))}
+let selectedBagSkill=null;
+function skillInventoryHTML(){
+ const known=player.learnedSkills||[];
+ const selected=selectedBagSkill && known.includes(selectedBagSkill)?selectedBagSkill:null;
+ return `<section class="skillmanager" id="skillmanager"><h3>✨ 나의 스킬 보관함</h3>
+  <p class="guide">① 아래 보유 스킬을 클릭해서 선택 → ② 아래 1~5번 원하는 칸을 클릭해서 장착! 이미 스킬이 있는 칸을 누르면 교체돼. 장착된 스킬을 클릭해 선택하고 <b>장착 해제</b>도 할 수 있어.</p>
+  <h3>📚 보유 스킬 <small class="muted">(${known.length}개)</small></h3>
+  <div class="skilllibrary">${known.length?known.map((name,i)=>{const slot=player.skillSlots.indexOf(name);return `<button class="skillpick ${selected===name?'selected':''} ${slot>=0?'equipped':''}" data-pick-skill="${i}" aria-pressed="${selected===name}"><strong>✨ ${name}</strong><small>${slot>=0?`✅ ${slot+1}번 칸 장착 중`:'📖 보관 중'}</small></button>`}).join(''):'<p class="muted">아직 배운 스킬이 없어! 전직관에게서 스킬을 배우면 이곳에 나타나.</p>'}</div>
+  <h3>🎮 스킬 장착 칸 <small class="muted">(1~5)</small></h3>
+  <div class="skillassign">${player.skillSlots.map((name,i)=>`<button class="skilltarget ${name?'filled':''} ${selected?'ready':''}" data-assign-slot="${i}" title="${selected?selected+' 장착':name?'스킬 선택 또는 해제':'보유 스킬을 먼저 선택해'}"><b>${i+1}</b><span>${name||'빈 칸'}</span><small>${selected?'여기에 넣기':name?'장착 중':'장착 가능'}</small></button>`).join('')}</div>
+  <div class="skillactions"><button id="unequipPicked" ${!selected||!player.skillSlots.includes(selected)?'disabled':''}>↩ 선택 스킬 장착 해제</button><button id="cancelPicked" ${!selected?'disabled':''}>선택 취소</button><span class="muted small" id="skillChoiceHelp">${selected?'선택한 스킬: '+selected+' · 원하는 칸을 눌러!':'보유 스킬을 먼저 눌러 줘.'}</span></div></section>`;
+}
+function bindSkillBag(){
+ document.querySelectorAll('[data-pick-skill]').forEach(b=>b.onclick=()=>{const name=player.learnedSkills[Number(b.dataset.pickSkill)];selectedBagSkill=selectedBagSkill===name?null:name;refreshSkillManager()});
+ document.querySelectorAll('[data-assign-slot]').forEach(b=>b.onclick=()=>{
+  const slot=Number(b.dataset.assignSlot);
+  if(selectedBagSkill && player.learnedSkills.includes(selectedBagSkill)){
+   const name=selectedBagSkill;
+   player.skillSlots=player.skillSlots.map(s=>s===name?null:s);
+   player.skillSlots[slot]=name;
+   selectedBagSkill=null;
+   save();renderBelt();refreshSkillManager();toast('✨ '+name+' → '+(slot+1)+'번 슬롯 장착!');
+  }else if(player.skillSlots[slot]){
+   selectedBagSkill=player.skillSlots[slot];refreshSkillManager();toast('✨ '+selectedBagSkill+' 선택됨 · 다른 칸을 누르면 이동!');
+  }else toast('먼저 위의 보유 스킬을 선택해 줘!');
+ });
+ const unequip=document.getElementById('unequipPicked');if(unequip)unequip.onclick=()=>{
+  const name=selectedBagSkill;if(!name)return;
+  player.skillSlots=player.skillSlots.map(s=>s===name?null:s);selectedBagSkill=null;save();renderBelt();refreshSkillManager();toast('📚 '+name+'을 보관함으로 옮겼어!');
+ };
+ const cancel=document.getElementById('cancelPicked');if(cancel)cancel.onclick=()=>{selectedBagSkill=null;refreshSkillManager()};
+}
+function refreshSkillManager(){const old=document.getElementById('skillmanager');if(!old)return;old.outerHTML=skillInventoryHTML();bindSkillBag()}
+function openInventory(){if(!player)return;const items=Object.entries(player.inventory).filter(([name,num])=>num>0).map(([name,num])=>`<div class="bagItem">🎁 <b>${name} × ${num}</b><small>몬스터 드롭 재료</small></div>`).join('');const weapons=player.weapons.map((name,i)=>`<div class="bagItem">⚔️ <b>${name}</b><small>공격력 +${(WEAPONS.find(w=>w.name===name)?.atk||0)+upgradeBonus(name)} ${equipmentUpgrade(name)?'· 강화 +'+equipmentUpgrade(name):''} ${name===player.weapon?'· 장착 중':''}</small><button data-equip="${i}" ${name===player.weapon?'disabled':''}>${name===player.weapon?'장착 중':'무기 장착'}</button></div>`).join('');const armors=(player.armors||[]).map((name,i)=>`<div class="bagItem">🛡️ <b>${name}</b><small>방어력 +${ARMORS.find(a=>a.name===name)?.def||0} ${name===player.armor?'· 장착 중':''}</small><button data-armor="${i}" ${name===player.armor?'disabled':''}>${name===player.armor?'장착 중':'방어구 장착'}</button></div>`).join('');showDialog('🎒 내 배낭 · B 키',`<p>⚔️ 현재 공격력 <b>${attackStat()}</b> · 🛡️ 방어력 <b>${armorDef()}</b> · 🪙 <b>${player.gold}G</b></p><h3>무기</h3><div class="inventoryGrid">${weapons}</div><h3>방어구</h3><div class="inventoryGrid">${armors||'<div class="bagItem">아직 방어구가 없어! 마을 방어구 상인을 찾아봐.</div>'}</div><h3>재료 · 소모품</h3><div class="inventoryGrid">${items}<div class="bagItem">🧪 회복 물약 × ${player.potions}</div><div class="bagItem">🏹 화살 × ${player.inventory['화살']||0}<small>활·석궁으로 일반 공격 시 1발 소모</small></div></div>${skillInventoryHTML()}`,[['닫기 (B)',closeDialog]]);document.querySelectorAll('[data-equip]').forEach(b=>b.onclick=()=>{player.weapon=player.weapons[Number(b.dataset.equip)];toast('⚔️ '+player.weapon+' 장착!');save();openInventory()});document.querySelectorAll('[data-armor]').forEach(b=>b.onclick=()=>{player.armor=player.armors[Number(b.dataset.armor)];toast('🛡️ '+player.armor+' 장착!');save();openInventory()});bindSkillBag()}
+const SHOP_WEAPONS=WEAPONS.filter(w=>w.price>0);
+function gearTier(v){return v<500?'일반':v<2500?'고급':v<12000?'희귀':v<45000?'영웅':'전설'}
+function gearTierColor(v){return v<500?'#b9c6d2':v<2500?'#6be6b3':v<12000?'#72b6ff':v<45000?'#d9a0ff':'#ffca78'}
+let shopFilter='전체';
+function openShop(kind,filter){if(!player)return;const isWeapon=kind==='weapon',all=(isWeapon?SHOP_WEAPONS:ARMORS.filter(a=>a.price>0));shopFilter=filter||'전체';const stocks=all.filter(it=>shopFilter==='전체'||gearTier(it.price)===shopFilter);const title=isWeapon?'⚔️ 무기 상점':'🛡️ 방어구 상점';let html=`<div class="shopintro"><b>🪙 보유 ${player.gold.toLocaleString()}G</b><span>총 ${all.length}종 · 무기는 구매 즉시 장착 · B키로 변경 가능</span></div><div class="shopfilters">${['전체','일반','고급','희귀','영웅','전설'].map(f=>`<button data-tier="${f}" class="${shopFilter===f?'chosen':''}">${f}</button>`).join('')}</div><div class="inventoryGrid upgradedShop">`;
+stocks.forEach((it,i)=>{const owned=(isWeapon?player.weapons:player.armors).includes(it.name),power=isWeapon?it.atk:it.def,current=isWeapon?weaponAtk():armorDef(),difference=power-current;html+=`<div class="bagItem gearcard" style="--tier:${gearTierColor(it.price)}"><div class="gearhead"><span class="gearicon">${isWeapon?'⚔️':'🛡️'}</span><span class="geartitle"><b>${it.name}</b><small>${gearTier(it.price)} 장비 · ${isWeapon?'공격력':'방어력'} +${power}</small></span></div><span class="compar ${difference>=0?'up':'down'}">현재 장착보다 ${difference>=0?'+':''}${difference}</span><div class="gearbottom"><b class="gold">${it.price.toLocaleString()}G</b><button data-buy="${i}" ${owned||player.gold<it.price?'disabled':''}>${owned?'보유 중':player.gold<it.price?'골드 부족':'구매'}</button></div></div>`});
+html+='</div>';showDialog(title,html,[['상점 나가기',closeDialog]]);document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>openShop(kind,b.dataset.tier));document.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const it=stocks[Number(b.dataset.buy)],collection=isWeapon?player.weapons:player.armors;if(!it||collection.includes(it.name)||player.gold<it.price)return;player.gold=Math.max(0,player.gold-it.price);collection.push(it.name);if(isWeapon)player.weapon=it.name;log('🛍️ '+it.name+' 구매 ('+it.price+'G)');toast(isWeapon?'⚔️ '+it.name+' 구매 · 바로 장착 완료!':'🎉 '+it.name+' 획득! B키로 장착해!');save();openShop(kind,shopFilter)})}
+
+const LOOKS={skin:[['밝은 피부','#f2cfae'],['기본 피부','#e4b78d'],['구릿빛 피부','#ad7854'],['짙은 피부','#75513b']],hair:[['검정','#211b22'],['갈색','#754b30'],['금발','#e6ba58'],['은색','#bfcbd9'],['분홍','#d67db7']],shirt:[['하늘색','#78c7fa'],['붉은색','#de6c70'],['초록색','#76ba87'],['보라색','#ac83db'],['노란색','#eac766']],pants:[['남색','#29364b'],['검정','#1a1b23'],['청색','#4b70a9'],['갈색','#75604c']]};
+function openCustomize(){if(!player)return;const a=player.appearance;let html='<p>캐릭터의 외모는 언제든 바꿀 수 있어. 닉네임은 변경되지 않아.</p>';for(const [key,label] of [['skin','피부색'],['hair','머리색'],['shirt','상의'],['pants','하의']]){html+=`<div class="lookrow"><b>${label}</b><div class="lookopts">${LOOKS[key].map(([name,col])=>`<button class="swatch ${a[key]===col?'chosen':''}" data-look="${key}" data-color="${col}" title="${name}" style="--swatch:${col}">${name}</button>`).join('')}</div></div>`}html+=`<div class="lookrow"><b>헤어스타일</b><div class="lookopts">${['짧은 머리','옆머리','긴 머리'].map((n,i)=>`<button data-style="${i}" class="${a.hairStyle===i?'chosen':''}">${n}</button>`).join('')}</div></div>`;showDialog('🎨 캐릭터 꾸미기',html,[['완료 · 저장',()=>{save(true);closeDialog()}]]);document.querySelectorAll('[data-look]').forEach(b=>b.onclick=()=>{a[b.dataset.look]=b.dataset.color;save();openCustomize()});document.querySelectorAll('[data-style]').forEach(b=>b.onclick=()=>{a.hairStyle=Number(b.dataset.style);save();openCustomize()})}
+$('inventoryTopBtn').onclick=()=>dialogOpen?closeDialog():openInventory();$('inventoryBtn').onclick=()=>dialogOpen?closeDialog():openInventory();$('customBtn').onclick=openCustomize;
+function drawGround(){let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#406e68');g.addColorStop(1,'#315f54');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(-cam.x,-cam.y);
+for(const r of REGIONS){if(r.x>cam.x+W||r.x+r.w<cam.x||r.y>cam.y+H||r.y+r.h<cam.y)continue;
+ ctx.fillStyle=r.color;ctx.fillRect(r.x,r.y,r.w,r.h);
+ ctx.globalAlpha=.28;ctx.strokeStyle=r.mark;ctx.lineWidth=8;ctx.setLineDash([26,16]);ctx.strokeRect(r.x+12,r.y+12,r.w-24,r.h-24);ctx.setLineDash([]);ctx.globalAlpha=1;
+ ctx.fillStyle='#0f2a37';ctx.fillRect(r.x+35,r.y+38,265,51);ctx.font='bold 28px system-ui';ctx.textAlign='left';ctx.fillStyle='#ffffff';ctx.fillText(r.name,r.x+52,r.y+73);
+ for(let i=0;i<95;i++){let bx=r.x+(Math.sin(i*73.4+9)*.5+.5)*r.w,by=r.y+(Math.sin(i*31.1+12)*.5+.5)*r.h;if(bx<cam.x-20||bx>cam.x+W+20||by<cam.y-20||by>cam.y+H+20)continue;ctx.fillStyle=r.mark;ctx.globalAlpha=.3;ctx.beginPath();ctx.arc(bx,by,(i%3+1)*5,0,7);ctx.fill()}ctx.globalAlpha=1;
+}
+ctx.fillStyle='#78a66f';ctx.fillRect(605,120,515,690);
+// 은은한 풀잎과 작은 꽃, 카메라 이동에 따라 보이는 장식
+for(let gx=Math.floor(cam.x/125)*125;gx<cam.x+W+130;gx+=125)for(let gy=Math.floor(cam.y/125)*125;gy<cam.y+H+130;gy+=125){let seed=Math.abs(Math.sin(gx*12.9898+gy*78.233));let fx=gx+seed*105,fy=gy+Math.abs(Math.sin(gx*3.7+gy*1.9))*94;ctx.globalAlpha=.24;ctx.strokeStyle=seed>.7?'#fbe29c':'#b9e5a0';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fx,fy+7);ctx.lineTo(fx-3,fy-3);ctx.moveTo(fx,fy+7);ctx.lineTo(fx+4,fy-1);ctx.stroke();if(seed>.86){ctx.fillStyle='#ffe6a5';ctx.beginPath();ctx.arc(fx,fy-5,2.5,0,7);ctx.fill()}ctx.globalAlpha=1;}
+ctx.strokeStyle='#dce99a';ctx.lineWidth=10;ctx.setLineDash([18,10]);ctx.strokeRect(605,120,515,690);ctx.setLineDash([]);ctx.fillStyle='#244e35';ctx.font='bold 30px system-ui';ctx.textAlign='center';ctx.fillText('🐇 시작의 토끼 숲',857,145);ctx.fillStyle='#6b9365';ctx.fillRect(55,90,530,525);ctx.strokeStyle='#89a77b';ctx.lineWidth=3;ctx.strokeRect(55,90,530,525);ctx.fillStyle='#b8ac7c';ctx.beginPath();ctx.moveTo(0,330);ctx.quadraticCurveTo(750,390,1050,680);ctx.quadraticCurveTo(1240,755,1540,750);ctx.lineTo(1550,850);ctx.quadraticCurveTo(1100,850,980,740);ctx.quadraticCurveTo(600,490,0,475);ctx.fill();ctx.fillStyle='#77768a';ctx.beginPath();ctx.ellipse(1500,780,305,215,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#af9caf';ctx.lineWidth=11;ctx.beginPath();ctx.ellipse(1500,780,290,203,0,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#4d516b';ctx.beginPath();ctx.arc(1490,785,82,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#facb7b';ctx.lineWidth=6;ctx.stroke();for(const b of bushes){ctx.fillStyle=b.t>.65?'#86a16b':'#4d8468';ctx.beginPath();ctx.arc(b.x,b.y,2.4+b.t*2,0,7);ctx.fill()}for(const r of rocks){ctx.fillStyle='#263e46';ctx.beginPath();ctx.ellipse(r.x+2,r.y+5,r.s,r.s*.52,0,0,7);ctx.fill();ctx.fillStyle='#788e91';ctx.beginPath();ctx.ellipse(r.x,r.y,r.s*.8,r.s*.54,-.4,0,7);ctx.fill()}for(const t of trees){ctx.fillStyle='#1b3130a9';ctx.beginPath();ctx.ellipse(t.x+8,t.y+16,24*t.s,10*t.s,0,0,7);ctx.fill();ctx.fillStyle='#5f4738';ctx.fillRect(t.x-5*t.s,t.y-10*t.s,10*t.s,29*t.s);for(let i=0;i<3;i++){ctx.fillStyle=['#245947','#327358','#438865'][i];ctx.beginPath();ctx.arc(t.x+(i-1)*10*t.s,t.y-(19+i*7)*t.s,(19+i*4)*t.s,0,7);ctx.fill()}}drawBuildings();
+// distant trainer outposts and signs at each separated location
+for(let i=0;i<TRAINER_SPOTS.length;i++){
+ let [px,py]=TRAINER_SPOTS[i];
+ ctx.fillStyle='#203f42aa';ctx.beginPath();ctx.ellipse(px,py+11,78,29,0,0,7);ctx.fill();
+ ctx.strokeStyle='#a7b894';ctx.lineWidth=4;ctx.strokeRect(px-60,py-66,120,82);
+ ctx.fillStyle='#5e3e32';ctx.fillRect(px+47,py-82,7,42);ctx.fillStyle='#d2ab70';ctx.fillRect(px+21,py-91,66,19);
+ ctx.fillStyle='#2e2a28';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText(JOBS[i][0],px+54,py-77);
+}
+// region paths and landmarks
+ctx.setLineDash([16,12]);ctx.strokeStyle='#d1bd8570';ctx.lineWidth=21;
+ctx.beginPath();ctx.moveTo(420,420);for(let i=0;i<TRAINER_SPOTS.length;i++){let [px,py]=TRAINER_SPOTS[i];ctx.lineTo(px,py)}ctx.stroke();ctx.setLineDash([]);
+ctx.strokeStyle='#d2c08645';ctx.lineWidth=5;ctx.strokeRect(20,20,worldWidth-40,worldHeight-40);
+ctx.restore()}
+function drawBuildings(){let houses=[{x:130,y:155,w:127,h:110,c:'#d48f72'},{x:380,y:140,w:142,h:98,c:'#9d91ca'},{x:195,y:475,w:122,h:100,c:'#9ca8b2'}];houses.forEach(h=>{ctx.fillStyle='#1b3035a0';ctx.fillRect(h.x+10,h.y+18,h.w,h.h);ctx.fillStyle='#d8be96';ctx.fillRect(h.x,h.y+27,h.w,h.h-27);ctx.fillStyle=h.c;ctx.beginPath();ctx.moveTo(h.x-13,h.y+29);ctx.lineTo(h.x+h.w/2,h.y-17);ctx.lineTo(h.x+h.w+13,h.y+29);ctx.closePath();ctx.fill();ctx.fillStyle='#524037';ctx.fillRect(h.x+h.w*.44,h.y+59,h.w*.18,45);ctx.fillStyle='#fce2a1';ctx.fillRect(h.x+14,h.y+48,22,20);ctx.fillRect(h.x+h.w-37,h.y+48,22,20)});ctx.fillStyle='#9cbab6';ctx.beginPath();ctx.arc(355,305,33,0,7);ctx.fill();ctx.fillStyle='#69a2c6';ctx.beginPath();ctx.arc(355,305,24,0,7);ctx.fill()}
+function drawSprite(x,y,color,emoji,scale=1){ctx.save();ctx.translate(x-cam.x,y-cam.y);ctx.scale(scale,scale);ctx.fillStyle='#152b2f80';ctx.beginPath();ctx.ellipse(2,18,24,8,0,0,7);ctx.fill();ctx.fillStyle=color;ctx.beginPath();ctx.arc(0,-5,21,0,7);ctx.fill();ctx.strokeStyle='#f9f1d9';ctx.lineWidth=2;ctx.stroke();ctx.font='25px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(emoji,0,-6);ctx.restore()}
+// 손에 든 무기는 장착 중인 아이템 이름에 따라 실제 모양과 색상이 달라진다.
+function drawEquippedWeapon(name){
+ const w=WEAPONS.find(item=>item.name===name);
+ const power=w?.atk||0;
+ const legendary=power>=145||/전설|신화|태양|월광|별빛|혼돈|왕국|용|드레이크/.test(name);
+ const rare=power>=55;
+ const color=legendary?'#ffdb80':rare?'#81d7f9':'#bac4cd';
+ const glow=legendary?'#ffb949':rare?'#81d7f9':null;
+ const isBow=/활|석궁/.test(name), isStaff=/지팡이|완드|홀|로드/.test(name), isDagger=/단검|비수|나이프/.test(name);
+ const isHammer=/해머|망치|철퇴|메이스|곤봉|몽둥이/.test(name), isSpear=/창|랜스|할버드/.test(name);
+ const isScythe=/낫/.test(name), isAxe=/도끼/.test(name);
+ ctx.save(); ctx.lineJoin='round';ctx.lineCap='round';
+ if(glow){ctx.shadowColor=glow;ctx.shadowBlur=10;}
+ if(isBow){
+   ctx.strokeStyle=rare?'#e8a3fe':'#a27648';ctx.lineWidth=4;
+   ctx.beginPath();ctx.moveTo(-1,6);ctx.quadraticCurveTo(18,-12,0,-37);ctx.stroke();
+   ctx.strokeStyle='#f9e9d1';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(-1,6);ctx.lineTo(0,-37);ctx.stroke();
+   ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(-2,-21);ctx.lineTo(-2,-32);ctx.lineTo(1,-23);ctx.fill();
+ }else if(isStaff){
+   ctx.strokeStyle=rare?'#7d4f9c':'#7b5639';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(0,7);ctx.lineTo(0,-38);ctx.stroke();
+   ctx.fillStyle=glow||'#a7dce9';ctx.beginPath();ctx.arc(0,-42,7,0,Math.PI*2);ctx.fill();
+   ctx.strokeStyle='#f7e9ff';ctx.lineWidth=2;ctx.stroke();
+ }else if(isHammer||isAxe){
+   ctx.fillStyle='#705039';ctx.fillRect(-2.5,-27,5,37);
+   ctx.fillStyle=color;
+   if(isAxe){ctx.beginPath();ctx.moveTo(0,-37);ctx.lineTo(16,-40);ctx.lineTo(16,-22);ctx.lineTo(0,-24);ctx.closePath();ctx.fill();}
+   else {ctx.fillRect(-15,-37,30,15);ctx.fillStyle='#ffffff55';ctx.fillRect(-15,-37,30,3);}
+ }else if(isSpear){
+   ctx.fillStyle='#7e5037';ctx.fillRect(-2,-36,4,44);ctx.fillStyle=color;
+   ctx.beginPath();ctx.moveTo(0,-53);ctx.lineTo(-7,-37);ctx.lineTo(0,-32);ctx.lineTo(7,-37);ctx.closePath();ctx.fill();
+ }else if(isScythe){
+   ctx.fillStyle='#6f4f43';ctx.fillRect(-2,-38,4,46);ctx.fillStyle=color;
+   ctx.beginPath();ctx.moveTo(0,-39);ctx.quadraticCurveTo(26,-46,16,-22);ctx.quadraticCurveTo(17,-42,0,-39);ctx.fill();
+ }else{
+   const bladeLength=isDagger?20:legendary?44:34;
+   ctx.fillStyle='#76513b';ctx.fillRect(-3,-9,6,19);
+   ctx.fillStyle=legendary?'#f2bc4c':'#b48a57';ctx.fillRect(-10,-11,20,5);
+   ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(-5,-11);ctx.lineTo(-5,-bladeLength);ctx.lineTo(0,-bladeLength-9);ctx.lineTo(5,-bladeLength);ctx.lineTo(5,-11);ctx.closePath();ctx.fill();
+   ctx.strokeStyle='#ffffffaa';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,-13);ctx.lineTo(0,-bladeLength-7);ctx.stroke();
+ }
+ if(legendary){ctx.fillStyle='#ffffffd0';ctx.beginPath();ctx.arc(11,-31,2.5,0,7);ctx.fill();}
+ ctx.restore();
+}
+function drawHuman(x,y,color,scale=1,hero=false){
+ ctx.save();ctx.translate(x-cam.x,y-cam.y);ctx.scale(scale,scale);
+ const moving=hero&&player&&(keys.w||keys.a||keys.s||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright);
+ const active=motionFX.findLast?.(m=>m.trainer!==hero&&Math.hypot(m.x-x,m.y-y)<5&&performance.now()-m.at<900);
+ const phase=active?Math.min(1,(performance.now()-active.at)/850):0;
+ const casting=!!active, swing=casting?Math.sin(phase*Math.PI)*22:0;
+ const walk=moving?Math.sin(frame*.27)*6:0, sway=moving?Math.sin(frame*.27)*2:0;
+ ctx.fillStyle='#10252c85';ctx.beginPath();ctx.ellipse(1,19,18,5,0,0,7);ctx.fill();
+ // pants and boots, natural swinging stride
+ ctx.strokeStyle=hero?(player.appearance?.pants||'#29364b'):'#29364b';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-6,2);ctx.lineTo(-7+walk,16);ctx.moveTo(6,2);ctx.lineTo(7-walk,16);ctx.stroke();
+ ctx.strokeStyle='#161e2a';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-7+walk,16);ctx.lineTo(-10+walk,19);ctx.moveTo(7-walk,16);ctx.lineTo(10-walk,19);ctx.stroke();
+ // torso, neck, sleeves and hands
+ ctx.fillStyle=hero?(player.appearance?.skin||'#e4b78d'):'#e4b78d';ctx.fillRect(-3,-28,6,8);ctx.fillStyle=hero?(player.appearance?.shirt||color):color;
+ ctx.beginPath();ctx.moveTo(-11,-22);ctx.quadraticCurveTo(0,-27,11,-22);ctx.lineTo(12,2);ctx.quadraticCurveTo(0,7,-12,2);ctx.closePath();ctx.fill();
+ ctx.strokeStyle='#352f35';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#684634';ctx.fillRect(-12,-2,24,4);ctx.fillStyle='#e9bc74';ctx.fillRect(-2,-2,5,4);
+ ctx.strokeStyle=hero?(player.appearance?.shirt||color):color;ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(-11,-19);ctx.lineTo(-17-swing*.20,-6-sway-swing*.52);ctx.moveTo(11,-19);ctx.lineTo(17+swing*.44,-6+sway-swing*.85);ctx.stroke();
+ ctx.fillStyle=hero?(player.appearance?.skin||'#e4b78d'):'#e4b78d';for(let side of [-1,1]){ctx.beginPath();ctx.arc(side*17+(side===1?swing*.44:-swing*.20),-5+side*sway-swing*(side===1?.85:.52),4,0,Math.PI*2);ctx.fill()}
+ // head with hair shape and ear details
+ ctx.fillStyle=hero?(player.appearance?.skin||'#e2b58d'):'#e2b58d';ctx.beginPath();ctx.ellipse(0,-33,10.5,12.5,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle=hero?(player.appearance?.hair||'#2c2330'):'#514032';ctx.beginPath();ctx.moveTo(-11,-36);ctx.quadraticCurveTo(-13,-50,-2,-46);ctx.quadraticCurveTo(9,-51,12,-39);ctx.lineTo(10,-35);ctx.lineTo(6,-41);ctx.lineTo(2,-37);ctx.lineTo(-3,-41);ctx.lineTo(-10,-34);ctx.closePath();ctx.fill();
+ if(hero&&player.appearance?.hairStyle===1){ctx.fillRect(-12,-41,24,5);ctx.fillRect(5,-44,8,8)}if(hero&&player.appearance?.hairStyle===2){ctx.beginPath();ctx.ellipse(10,-24,7,12,0,0,7);ctx.fill()}ctx.fillStyle='#242333';ctx.fillRect(-5,-34,2.3,2);ctx.fillRect(3,-34,2.3,2);
+ ctx.strokeStyle='#a66d64';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-2,-28);ctx.quadraticCurveTo(0,-27,2,-28);ctx.stroke();
+ if(hero&&player&&player.armor){ctx.fillStyle=ARMORS.find(a=>a.name===player.armor)?.color||'#a7b5cb';ctx.fillRect(-10,-18,20,15);ctx.strokeStyle='#f1e3c4';ctx.lineWidth=1;ctx.strokeRect(-10,-18,20,15)}if(hero&&player&&player.weapon&&player.weapon!=='맨손'){
+ ctx.save();ctx.translate(17+swing*.44,-6+sway-swing*.85);ctx.rotate(-.32+walk*.015-swing*.055);
+ drawEquippedWeapon(player.weapon);ctx.restore();
+}
+ // subtle fabric seams, layered chest badge, eyes and hair glints
+ ctx.save();ctx.globalAlpha=.42;ctx.strokeStyle='#f9e2ba';ctx.lineWidth=1.25;ctx.beginPath();ctx.moveTo(-7,-18);ctx.lineTo(-5,-3);ctx.moveTo(7,-18);ctx.lineTo(5,-3);ctx.stroke();ctx.restore();
+ ctx.fillStyle='#f6ebd5';ctx.beginPath();ctx.arc(-4.4,-34.3,.8,0,7);ctx.arc(4,-34.3,.8,0,7);ctx.fill();
+ ctx.strokeStyle='#6a4440';ctx.lineWidth=.75;ctx.beginPath();ctx.moveTo(0,-32);ctx.lineTo(-.6,-30.5);ctx.stroke();
+ if(hero){const a=player.appearance||{};ctx.strokeStyle='#ffffff55';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(-8,-43);ctx.quadraticCurveTo(-3,-48,3,-46);ctx.stroke();ctx.fillStyle='#e9c87d';ctx.beginPath();ctx.arc(0,-10,3,0,7);ctx.fill();}
+ ctx.restore();}
+function drawEntities(){for(const n of NPCS){if(n.id==='trainer'){let xx=n.x-cam.x,yy=n.y-cam.y;ctx.strokeStyle='#ffcf67';ctx.lineWidth=3;ctx.beginPath();ctx.arc(xx,yy+3,29+Math.sin(frame*.055)*3,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#ffde82';ctx.beginPath();ctx.moveTo(xx,yy-94);ctx.lineTo(xx-9,yy-77);ctx.lineTo(xx+9,yy-77);ctx.fill()}drawHuman(n.x,n.y,n.color,1.05,false);ctx.fillStyle='#071422d9';ctx.font='bold 15px system-ui';ctx.textAlign='center';let x=n.x-cam.x,y=n.y-cam.y;ctx.fillRect(x-77,y-49,154,24);ctx.fillStyle='#ffe5a6';ctx.fillText(n.name,x,y-32);if(player&&dist(player,n)<140){ctx.fillStyle='#ffffff';ctx.font='bold 13px system-ui';ctx.fillText('E 대화',x,y-61)}}for(const e of enemies){if(!e.alive)continue;let t=e.boss?{color:'#ecb55d',icon:'👁️',name:'혼돈의 수호자'}:ENEMY_TYPES[e.type];drawSprite(e.x,e.y,e.flash>0?'#ffffff':t.color,e.boss?'👹':t.icon,e.boss?2:1);let x=e.x-cam.x,y=e.y-cam.y,w=e.boss?90:48;ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillStyle=e.lv>player.lv?'#ff9b9b':'#ecf8df';ctx.fillText('Lv.'+e.lv+' '+t.name,x,y-(e.boss?108:52));if(e.hp<e.maxHp||e.boss){ctx.fillStyle='#130b19';ctx.fillRect(x-w/2,y-(e.boss?84:45),w,7);ctx.fillStyle=e.boss?'#ff9c6c':'#f46f79';ctx.fillRect(x-w/2,y-(e.boss?84:45),w*(e.hp/e.maxHp),7)}if(e.boss){ctx.fillStyle='#ffe1a0';ctx.textAlign='center';ctx.font='bold 19px system-ui';ctx.fillText('⚠ 혼돈의 수호자',x,y-98)}}if(player){drawHuman(player.x,player.y,(player.job>=0?JOBS[player.job][3]:'#78c7fa'),1.18,true);let x=player.x-cam.x,y=player.y-cam.y;ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#101625';ctx.fillRect(x-67,y-64,134,23);ctx.fillStyle='#fff2ba';ctx.fillText(player.nick+' · Lv.'+player.lv,x,y-47);ctx.fillStyle='#ffdb82';ctx.fillRect(x-30,y-37,60*player.hp/player.maxHp,4)}}
+function renderMinimap(){let c=$('minimap'),m=c.getContext('2d'),w=c.width,h=c.height; m.clearRect(0,0,w,h);m.fillStyle='#183b3c';m.fillRect(0,0,w,h);m.fillStyle='#6c9360';m.fillRect(0,0,7,6);for(const r of REGIONS){m.fillStyle=r.color;m.fillRect(r.x/worldWidth*w,r.y/worldHeight*h,r.w/worldWidth*w,r.h/worldHeight*h)}m.strokeStyle='#678b8a';m.strokeRect(1,1,w-2,h-2);for(let n of NPCS){if(n.id!=='trainer'&&n.id!=='quest'&&n.id!=='forge'&&n.id!=='junkdealer')continue;m.fillStyle=n.id==='trainer'?'#f5cf74':n.id==='forge'?'#ff916c':n.id==='junkdealer'?'#f0dc8c':'#8fe4ae';m.beginPath();m.arc(n.x/worldWidth*w,n.y/worldHeight*h,2.5,0,7);m.fill()}m.strokeStyle='#9ad5ff';m.strokeRect(cam.x/worldWidth*w,cam.y/worldHeight*h,W/worldWidth*w,H/worldHeight*h);m.fillStyle='#fff';m.beginPath();m.arc(player.x/worldWidth*w,player.y/worldHeight*h,4,0,7);m.fill();m.font='bold 10px sans-serif';m.fillText('금색: 전직관 / 초록색: 의뢰 NPC',6,h-7)}
+const FX_GLYPHS=['⚔','✦','➶','✧','✚','✊','♆','❀','⚗','♫','⚙','☠','🐾','✚','☽','⚔','❁','◇','🎯','✿'];
+function careerVisual(m,t,x,y){
+ const j=Math.max(0,m.job||0),tier=Math.max(0,m.kind||0),phase=Math.max(0,Math.min(1,t/1.35));
+ const c=m.color||JOBS[j]?.[3]||'#a8eeff',fade=Math.pow(1-phase,1.25),power=1+tier*.24;
+ const local=(fn)=>{ctx.save();ctx.translate(x,y-16);ctx.globalAlpha=fade;ctx.lineJoin='round';ctx.lineCap='round';ctx.strokeStyle=c;ctx.fillStyle=c;ctx.shadowColor=c;ctx.shadowBlur=22+tier*12;fn();ctx.restore()};
+ const ring=(r,from=0,to=Math.PI*2)=>{ctx.beginPath();ctx.arc(0,0,Math.max(2,r),from,to);ctx.stroke()};
+ const line=(a,b,c,d)=>{ctx.beginPath();ctx.moveTo(a,b);ctx.lineTo(c,d);ctx.stroke()};
+ const spark=(xx,yy,r=6)=>{ctx.beginPath();ctx.moveTo(xx,yy-r);ctx.lineTo(xx+r*.55,yy);ctx.lineTo(xx,yy+r);ctx.lineTo(xx-r*.55,yy);ctx.closePath();ctx.fill()};
+ const orb=(xx,yy,r=5)=>{ctx.beginPath();ctx.arc(xx,yy,r,0,Math.PI*2);ctx.fill()};
+ local(()=>{
+  const radius=(38+phase*195)*power,spin=phase*Math.PI*4;
+  // Every spell has layered shockwaves, a flash, and orbiting light motes.
+  ctx.lineWidth=2+2*tier;ctx.globalAlpha=fade*.52;ring(radius*.65);ring(radius*.79,-spin,Math.PI*.8-spin);
+  ctx.globalAlpha=fade;ctx.lineWidth=4+tier;
+  for(let k=0;k<10+tier*4;k++){let a=k*Math.PI*2/(10+tier*4)+spin*(j%2?1:-1),rr=radius*(.56+(k%3)*.12);spark(Math.cos(a)*rr,Math.sin(a)*rr,3+(k%3)*2)}
+  ctx.globalAlpha=fade*.9;
+  const r=radius;
+  switch(j){
+   case 0:case 15: // swords: sweeping twin crescents
+    for(let k=0;k<3+tier;k++){ctx.beginPath();ctx.arc(0,0,40+phase*120+k*16,-2.3+spin*.28+k*.25,-.1+spin*.28+k*.25);ctx.stroke()}line(-r*.7,r*.25,r*.9,-r*.27);break;
+   case 1: // magic: runic spell matrix
+    ctx.save();ctx.rotate(spin*.3);ctx.strokeRect(-r*.36,-r*.36,r*.72,r*.72);ring(r*.51);for(let k=0;k<8;k++){let a=k*Math.PI/4;orb(Math.cos(a)*r*.52,Math.sin(a)*r*.52,5)}ctx.restore();break;
+   case 2:case 18: // archer / hunter: flights of arrows
+    for(let k=-3-tier;k<=3+tier;k++){let yy=k*14;line(-r*.55,yy,r*.85,yy-k*4);line(r*.85,yy-k*4,r*.7,yy-k*4-10);line(r*.85,yy-k*4,r*.7,yy-k*4+10)}break;
+   case 3:case 17: // shadow copies / illusion portals
+    for(let k=0;k<6+tier*2;k++){let a=k*2*Math.PI/(6+tier*2)+spin*.3;ctx.save();ctx.translate(Math.cos(a)*r*.65,Math.sin(a)*r*.4);ctx.rotate(a);ctx.strokeRect(-12,-22,24,44);line(-18,0,18,0);ctx.restore()}break;
+   case 4:case 13: // blessing/buffer: luminous crest
+    ring(r*.57);line(-r*.37,0,r*.37,0);line(0,-r*.37,0,r*.37);for(let k=0;k<12;k++){let a=k*Math.PI/6;line(Math.cos(a)*r*.65,Math.sin(a)*r*.65,Math.cos(a)*r*.95,Math.sin(a)*r*.95)}break;
+   case 5: // martial: fist impacts
+    for(let k=0;k<5+tier;k++){let a=k*2*Math.PI/(5+tier)+spin*.4;orb(Math.cos(a)*r*.7,Math.sin(a)*r*.7,12+tier*2);ring(r*.28+k*9)}break;
+   case 6: // spear: piercing lightning
+    for(let k=-2-tier;k<=2+tier;k++){let yy=k*17;line(-r*.5,yy,r*.85,yy);line(r*.85,yy,r*.67,yy-13);line(r*.85,yy,r*.67,yy+13)}break;
+   case 7:case 16: // spirits / leaves
+    for(let k=0;k<11+tier*3;k++){let a=k*2*Math.PI/(11+tier*3)+spin*.15,xx=Math.cos(a)*r*.8,yy=Math.sin(a)*r*.65;ctx.save();ctx.translate(xx,yy);ctx.rotate(a);ctx.beginPath();ctx.ellipse(0,0,13,5,0,0,Math.PI*2);ctx.stroke();ctx.restore()}break;
+   case 8: // alchemy bubbling cauldron
+    for(let k=0;k<20+tier*8;k++){let a=k*2.4+spin,rr=(k%5+1)*r/6;orb(Math.cos(a)*rr,Math.sin(a)*rr-(k%3)*6,3+k%4)}ring(r*.52);break;
+   case 9:case 19: // bard / dancer: melody spirals
+    for(let k=0;k<4+tier;k++){ctx.beginPath();ctx.arc(0,0,r*.25+k*20,-1.1+spin*.2,1.1+spin*.2);ctx.stroke()}ctx.font='bold 48px system-ui';ctx.textAlign='center';ctx.fillText(j===19?'✿':'♫',0,-r*.25);break;
+   case 10: // mechanic cogwheel and beams
+    for(let k=0;k<12;k++){let a=k*Math.PI/6+spin*.3;line(Math.cos(a)*r*.44,Math.sin(a)*r*.44,Math.cos(a)*r*.7,Math.sin(a)*r*.7)}ring(r*.48);ring(r*.25);break;
+   case 11: // shaman cursed seal
+    ctx.save();ctx.rotate(spin*.2);for(let k=0;k<6;k++){let a=k*Math.PI/3;line(Math.cos(a)*r*.7,Math.sin(a)*r*.7,Math.cos(a+2*Math.PI/3)*r*.7,Math.sin(a+2*Math.PI/3)*r*.7)}ctx.restore();ring(r*.72);break;
+   case 12: // tamer paw / companion silhouettes
+    for(let k=0;k<5;k++){let a=k*Math.PI*2/5+spin*.2;orb(Math.cos(a)*r*.65,Math.sin(a)*r*.65,9);orb(Math.cos(a)*r*.76+6,Math.sin(a)*r*.76-7,4)}ctx.font='bold 44px system-ui';ctx.textAlign='center';ctx.fillText('🐾',0,12);break;
+   case 14: // dark knight: black moon
+    ring(r*.68,-2.9,2.3);ctx.beginPath();ctx.arc(17,0,r*.52,-2.9,2.3);ctx.stroke();for(let k=0;k<5;k++)line(-r*.4+k*25,-r*.5,r*.4-k*15,r*.45);break;
+   default: ring(r*.6);ctx.font='bold 46px system-ui';ctx.textAlign='center';ctx.fillText(FX_GLYPHS[j]||'✦',0,-20);
+  }
+  // white-hot central flare, strongest just after casting
+  ctx.shadowColor='#ffffff';ctx.shadowBlur=30;ctx.globalAlpha=Math.max(0,1-phase*2)*.9;ctx.fillStyle='#ffffff';orb(0,0,12+tier*4);
+ });
+}
+function onlineMessage(name,msg){const list=$('onlineMessages');if(!list)return;const row=document.createElement('div');const who=document.createElement('b');who.textContent=name+': ';row.appendChild(who);row.appendChild(document.createTextNode(msg));list.appendChild(row);while(list.children.length>50)list.firstChild.remove();list.scrollTop=list.scrollHeight}
+function onlineBadge(status){$('onlineStatus').textContent=status}
+function onlineConnect(){
+ if(onlineSocket&&(onlineSocket.readyState===WebSocket.OPEN||onlineSocket.readyState===WebSocket.CONNECTING))return;
+ if(location.protocol==='file:'){onlineBadge('서버 필요');onlineMessage('안내','멀티플레이는 서버 주소로 접속해야 해요. README 파일을 확인하세요.');return}
+ const scheme=location.protocol==='https:'?'wss:':'ws:';
+ const socket=new WebSocket(scheme+'//'+location.host+'/ws');onlineSocket=socket;onlineBadge('접속 중…');
+ socket.onopen=()=>{onlineBadge('연결됨');onlineMessage('시스템','온라인 서버에 연결됐어요!');if(player)onlineSendHello()};
+ socket.onmessage=event=>{try{const data=JSON.parse(event.data);
+  if(data.type==='welcome'){onlineId=data.id;otherPlayers.clear();for(const p of data.players||[])if(p.id!==onlineId)otherPlayers.set(p.id,p);onlineBadge('접속 '+data.count+'명');if(player)onlineSendHello()}
+  else if(data.type==='join'){if(data.player&&data.player.id!==onlineId)otherPlayers.set(data.player.id,data.player);onlineBadge('접속 '+data.count+'명');if(data.player?.name)onlineMessage('시스템',data.player.name+'님 입장')}
+  else if(data.type==='state'){if(data.id!==onlineId&&otherPlayers.has(data.id))Object.assign(otherPlayers.get(data.id),data.state)}
+  else if(data.type==='leave'){const p=otherPlayers.get(data.id);if(p?.name)onlineMessage('시스템',p.name+'님 퇴장');otherPlayers.delete(data.id);onlineBadge('접속 '+data.count+'명')}
+  else if(data.type==='chat')onlineMessage(data.name||'모험가',data.message);
+  else if(data.type==='count')onlineBadge('접속 '+data.count+'명');
+  else if(data.type==='error')onlineMessage('서버',data.message||'요청을 처리하지 못했어요');
+ }catch(e){}};
+ socket.onclose=()=>{otherPlayers.clear();onlineId=null;onlineBadge('재연결 중…');if(onlineReconnect)clearTimeout(onlineReconnect);onlineReconnect=setTimeout(onlineConnect,3000)};
+ socket.onerror=()=>onlineBadge('연결 오류');
+}
+function onlineSendHello(){if(!player||onlineSocket?.readyState!==WebSocket.OPEN)return;onlineSocket.send(JSON.stringify({type:'hello',name:player.nick,state:onlineSelf()}))}
+function onlineSelf(){return{x:Math.round(player.x),y:Math.round(player.y),lv:player.lv,job:player.job,appearance:player.appearance||{},weapon:player.weapon||null,armor:player.armor||null,hp:Math.round(player.hp),maxHp:Math.round(player.maxHp),running:!!running}}
+function onlineTick(){if(!player||onlineSocket?.readyState!==WebSocket.OPEN)return;let now=performance.now();if(now-lastNetSend<95)return;lastNetSend=now;const data=JSON.stringify({type:'state',state:onlineSelf()});if(data!==lastNetState){onlineSocket.send(data);lastNetState=data}}
+function onlineDrawPlayers(){for(const p of otherPlayers.values()){
+ if(typeof p.x!=='number'||typeof p.y!=='number')continue;let x=p.x-cam.x,y=p.y-cam.y;if(x<-70||x>W+70||y<-70||y>H+70)continue;
+ const col=p.job>=0&&JOBS[p.job]?JOBS[p.job][3]:'#7cc9ff';
+ // NPC-style human sprite for other connected players.
+ drawHuman(p.x,p.y,col,1.18,false);
+ ctx.fillStyle='#071625e8';ctx.fillRect(x-80,y-70,160,27);
+ ctx.fillStyle='#95f6c6';ctx.textAlign='center';ctx.font='bold 13px system-ui';ctx.fillText((p.name||'모험가').slice(0,16)+' · Lv.'+(p.lv||1),x,y-52);
+ ctx.fillStyle='#233e4a';ctx.fillRect(x-35,y-40,70,5);ctx.fillStyle='#73e2a2';ctx.fillRect(x-35,y-40,70*Math.max(0,Math.min(1,(p.hp||0)/Math.max(1,p.maxHp||1))),5);
+ }}
+$('onlineChatForm').addEventListener('submit',e=>{e.preventDefault();let input=$('onlineChatInput'),msg=input.value.trim();if(!msg)return;if(onlineSocket?.readyState!==WebSocket.OPEN){onlineMessage('시스템','서버에 연결되지 않았어요');return}onlineSocket.send(JSON.stringify({type:'chat',message:msg.slice(0,120)}));input.value='';input.blur()});
+window.addEventListener('keydown',e=>{if(document.activeElement?.id==='onlineChatInput'){e.stopImmediatePropagation()}},true);
+window.addEventListener('keyup',e=>{if(document.activeElement?.id==='onlineChatInput'){e.stopImmediatePropagation()}},true);
+onlineConnect();
+function render(){ctx.clearRect(0,0,W,H);if(!player){ctx.fillStyle='#254e56';ctx.fillRect(0,0,W,H);return}cam.x+=(clamp(player.x-W/2,0,worldWidth-W)-cam.x)*.16;cam.y+=(clamp(player.y-H/2,0,worldHeight-H)-cam.y)*.16;drawGround();drawEntities();onlineDrawPlayers();ctx.save();ctx.translate(-cam.x,-cam.y);for(const p of projectiles){ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,8,0,7);ctx.fill()}for(const p of particles){ctx.globalAlpha=clamp(p.life/.7,0,1);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,7);ctx.fill()}ctx.globalAlpha=1;for(const f of floats){ctx.globalAlpha=clamp(f.life,0,1);ctx.font='bold 18px system-ui';ctx.textAlign='center';ctx.fillStyle='#0d1826';ctx.fillText(f.text,f.x+1,f.y+1);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y)}ctx.restore();ctx.globalAlpha=1;
+ motionFX=motionFX.filter(m=>performance.now()-m.at<1450);
+ for(const m of motionFX){const t=(performance.now()-m.at)/1000,x=m.x-cam.x,y=m.y-cam.y,alpha=Math.max(0,1-t/1.15);if(x<-110||x>W+110||y<-110||y>H+110)continue;
+ ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=m.color;ctx.shadowColor=m.color;ctx.shadowBlur=20;ctx.lineCap='round';
+ careerVisual(m,t,x,y);
+ ctx.restore();}
+ trainerDemos=trainerDemos.filter(d=>performance.now()-d.at<2600);
+ for(const d of trainerDemos){const age=(performance.now()-d.at)/2600,x=d.x-cam.x,y=d.y-cam.y;
+  if(x<-250||x>W+250||y<-250||y>H+250)continue;
+  ctx.save();ctx.globalAlpha=Math.min(1,(1-age)*1.9);ctx.strokeStyle=d.color;ctx.shadowColor=d.color;ctx.shadowBlur=25;ctx.lineWidth=7;
+  for(let k=0;k<3;k++){const r=25+age*260+k*36;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke()}
+  ctx.fillStyle=d.color;for(let k=0;k<12;k++){const a=k*Math.PI/6+age*7,r=50+age*170;ctx.beginPath();ctx.arc(x+Math.cos(a)*r,y+Math.sin(a)*r,9*(1-age)+2,0,Math.PI*2);ctx.fill()}
+  ctx.fillStyle='#fff6d7';ctx.textAlign='center';ctx.font='bold 16px system-ui';ctx.fillText('✨ '+CAREER_SKILLS[d.job][d.level===2?2:0]+' 시범',x,y-112);ctx.restore();
+  careerVisual({job:d.job,kind:d.level===2?2:1,color:d.color},age*1.2,x,y);
+ }
+
+ // Glowing return sigil, swirling runes, rising particles and arrival flash.
+ if(returnHeld&&player){const age=(performance.now()-returnStarted)/1000,progress=Math.min(1,age/4),x=player.x-cam.x,y=player.y-cam.y,t=performance.now()/1000;ctx.save();ctx.translate(x,y);ctx.globalAlpha=.45+.5*progress;ctx.shadowColor='#75ffe6';ctx.shadowBlur=20+progress*22;ctx.strokeStyle='#91ffee';ctx.lineWidth=3;for(let k=0;k<3;k++){ctx.beginPath();ctx.arc(0,5,27+progress*20+k*12,t*(k%2?-.9:1.1),t*(k%2?-.9:1.1)+Math.PI*1.45);ctx.stroke()}ctx.strokeStyle='#e5fff5';ctx.lineWidth=2;ctx.rotate(t*.8);for(let k=0;k<8;k++){let a=k*Math.PI/4;ctx.save();ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,-48-progress*20);ctx.lineTo(-6,-60-progress*20);ctx.lineTo(0,-73-progress*20);ctx.lineTo(6,-60-progress*20);ctx.closePath();ctx.stroke();ctx.restore()}ctx.rotate(-t*.8);for(let k=0;k<19;k++){let a=k*2.399+t*(k%2?1:-1),r=17+Math.sin(t*2+k)*12+progress*38;ctx.fillStyle=k%3?'#77fbe8':'#fff1b1';ctx.beginPath();ctx.arc(Math.cos(a)*r,Math.sin(a)*r-12-progress*15,2+progress*2.5,0,7);ctx.fill()}ctx.restore()}
+ if(returnArrival){let age=(performance.now()-returnArrival.at)/1000;if(age>1.35)returnArrival=null;else{let x=returnArrival.x-cam.x,y=returnArrival.y-cam.y,p=age/1.35;ctx.save();ctx.globalAlpha=1-p;ctx.strokeStyle='#baffef';ctx.shadowColor='#58ffdc';ctx.shadowBlur=34;ctx.lineWidth=12*(1-p)+1;for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(x,y,30+p*(130+i*55),0,Math.PI*2);ctx.stroke()}ctx.fillStyle='#edffea';for(let i=0;i<26;i++){let a=i*2.399,r=30+p*(110+i%5*16);ctx.beginPath();ctx.arc(x+Math.cos(a)*r,y+Math.sin(a)*r,4*(1-p)+1,0,7);ctx.fill()}ctx.restore()}}
+ renderMinimap();}
+
+function stopReturn(){returnHeld=false;returnStarted=0;const mob=$('mobileReturn');if(mob)mob.classList.remove('channeling');const count=$('mobileReturnPercent');if(count)count.textContent='0%';const panel=$('returnChannel');if(panel)panel.style.display='none'}
+function startReturn(){if(!player||dialogOpen||$('intro').style.display!=='none'||returnHeld)return;returnHeld=true;returnStarted=performance.now();$('mobileReturn').classList.add('channeling');$('returnChannel').style.display='block';$('returnProgress').style.width='0%';$('returnLabel').textContent='🏠 마을 귀환 준비 중… 0.0 / 4.0초';}
+function finishReturn(){if(!returnHeld)return;const fromX=player.x,fromY=player.y;returnArrival={x:fromX,y:fromY,at:performance.now(),type:'departure'};stopReturn();player.x=VILLAGE_RESPAWN.x;player.y=VILLAGE_RESPAWN.y;returnArrival={x:player.x,y:player.y,at:performance.now(),type:'arrival'};player.reviveProtection=performance.now()+1500;for(const e of enemies)e.atkAt=performance.now();projectiles=[];particle(player.x,player.y,'#8bfff0',38);floatText(player.x,player.y,'마을 귀환!','#b6fff1');toast('🏠 마을로 귀환했어!');log('🏠 귀환 마법으로 마을에 도착했다.');save(true);}
+function update(dt){if(!player||$('intro').style.display!=='none'||dialogOpen){if(returnHeld)stopReturn();return;}frame++;if(returnHeld){const elapsed=performance.now()-returnStarted;if(elapsed>=4000){finishReturn()}else{$('returnProgress').style.width=Math.min(100,elapsed/40)+'%';$('mobileReturnPercent').textContent=Math.floor(Math.min(100,elapsed/40))+'%';$('returnLabel').textContent='🏠 마을 귀환 준비 중… '+(elapsed/1000).toFixed(1)+' / 4.0초';}}const run=(running?1.55:1),speed=(player.job===3?235:202)*run;let dx=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),dy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);if((dx||dy)&&!returnHeld){let l=Math.hypot(dx,dy);player.x=clamp(player.x+dx/l*speed*dt,20,worldWidth-20);player.y=clamp(player.y+dy/l*speed*dt,20,worldHeight-20);if(dx)player.direction=Math.sign(dx)}player.mp=Math.min(player.maxMp,player.mp+dt*1.9);for(const e of enemies){if(!e.alive){e.respawn-=dt;if(e.respawn<=0){e.alive=true;e.hp=e.maxHp;e.x=e.homeX;e.y=e.homeY}continue}e.flash=Math.max(0,e.flash-dt);const t=e.boss?{speed:65,atk:32}:ENEMY_TYPES[e.type],d=dist(e,player);if(d<240){if(d>38){let nx=e.x+(player.x-e.x)/d*t.speed*dt,ny=e.y+(player.y-e.y)/d*t.speed*dt;e.x=clamp(nx,e.zone.x1,e.zone.x2);e.y=clamp(ny,e.zone.y1,e.zone.y2);confineEnemy(e)}if(d<47&&performance.now()-e.atkAt>(e.boss?900:1500)){e.atkAt=performance.now();damagePlayer(monsterAttack(e,t))}}else{e.wander+=dt;if(e.wander>2){e.wander=rand(-1,0);e.vx=rand(-1,1);e.vy=rand(-1,1)}e.x=clamp(e.x+(e.vx||0)*dt*18,e.zone.x1,e.zone.x2);e.y=clamp(e.y+(e.vy||0)*dt*18,e.zone.y1,e.zone.y2);confineEnemy(e)}}for(let i=projectiles.length-1;i>=0;i--){let p=projectiles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;if(p.target?.alive&&dist(p,p.target)<28){damageEnemy(p.target,p.dmg,p.color);projectiles.splice(i,1)}else if(p.life<0)projectiles.splice(i,1)}for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=160*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1)}for(let i=floats.length-1;i>=0;i--){floats[i].y-=40*dt;floats[i].life-=dt;if(floats[i].life<=0)floats.splice(i,1)}if(performance.now()-lastSave>12000){save();lastSave=performance.now()}}
+function loop(t){let dt=Math.min(.045,(t-last)/1000);last=t;update(dt);onlineTick();render();if(player&&frame%12===0)updateHUD();requestAnimationFrame(loop)}
+$('create').onclick=()=>{const n=$('nick').value.trim();if(n.length<2||n.length>12){$('formError').textContent='닉네임을 2~12글자로 정해줘!';return}if(/[<>\\]/.test(n)){$('formError').textContent='사용할 수 없는 특수문자가 있어!';return}if(localStorage.getItem(KEY)){$('formError').textContent='이미 저장된 닉네임이 있어. 기존 모험을 계속해줘!';return}player=createPlayer(n,-1);save();onlineSendHello();$('intro').style.display='none';log(`${n}의 모험 시작! 초보 모험가로 출발`);toast('🏘️ 이장에게 E로 말을 걸고 나무몽둥이를 받아!');updateHUD()};$('continue').onclick=()=>{$('intro').style.display='none';log('모험을 다시 시작합니다.');toast('⚔️ 모험을 계속하자!')};
+$('saveBtn').onclick=()=>save(true);$('autoSaveBtn').onclick=()=>{if(player)showDialog('📖 모험 가이드','<b>마을 무기·방어구 상인</b>: 골드로 장비 구매 후 B 배낭에서 장착<br><b>마을 이장</b>: 처음 말을 걸면 나무몽둥이 지급 → 초원 토끼 3마리 처치<br><b>전직관</b>: 직업 스킬 시범 관람 → 5레벨에 전용 퀘스트 → 전직 후 다시 대화하면 첫 기술을 배우고 추가 훈련으로 새 기술 해금<br><b>2차 전직</b>: 30레벨 달성 후 같은 직업 전직관에게 새로운 퀘스트 수락<br><b>유적 수호자</b>: 동쪽 유적에서 세계의 비밀을 조사할 수 있어.',[['확인',closeDialog]])};
+$('pinToggle').onclick=()=>{pinnedCollapsed=!pinnedCollapsed;$('pinnedQuestItems').style.display=pinnedCollapsed?'none':'block';$('pinToggle').textContent=pinnedCollapsed?'+':'−';if(!pinnedCollapsed)updateHUD()};
+$('questNpcBtn').onclick=()=>{if(!player)return;showDialog('🧭 NPC 길잡이',`전직관 ${JOBS.length}명과 퀘스트 의뢰인 16명이 왕국 전역에 흩어져 있어!  오른쪽 미니맵에서 금색 점은 전직관, 초록색 점은 퀘스트 NPC야!<br><br>${NPCS.filter(n=>n.id==='trainer').map(n=>`<b>${n.name}</b>: ${n.x<900?'마을 부근':n.x<2600?'서부 숲':'먼 지역'} (${n.x}, ${n.y})`).join('<br>')}<hr><b>📜 의뢰 NPC 위치</b><br>${NPCS.filter(n=>n.id==='quest').map(n=>`${n.name}: (${n.x}, ${n.y})`).join('<br>')}<br><br>✨ <b>5레벨</b>부터 원하는 전직관의 퀘스트를 받아 1차 전직! <b>30레벨</b>에 같은 전직관에게 2차 전직!`,[['확인',closeDialog]])};
+$('mapBtn').onclick=()=>{if(player)showDialog('🗺️ 왕국 지역','북서쪽 <b>엉뚱한 마을</b>: 이장·물약 상인·첫 토끼 사냥터<br>중앙 <b>깊은 숲</b>: 버섯·고블린·늑대<br>남쪽 <b>붉은 숲</b>과 동쪽 <b>먼 산</b>: 멀리 떨어진 전직관들<br><b>고대의 유적</b>: 강력한 수호자<br><br>🧭 각 직업 전직관은 지도 곳곳의 <b>금색 빛기둥과 이름표</b>로 찾을 수 있어.', [['좋아!',closeDialog]])};
+window.addEventListener('keydown',e=>{let k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();keys[k]=true;if(e.repeat)return;if($('intro').style.display!=='none')return;if(k==='c'){e.preventDefault();if(!dialogOpen)startReturn();return;}if((e.code==='NumpadAdd'||e.code==='Equal'||e.key==='+'||e.key==='=')){e.preventDefault();handleResignPlus();return;}if(k==='shift'){running=!running;$('runChip').textContent=running?'🏃 달리기 ON · Shift 걷기':'🚶 걷기 · Shift 달리기 전환';toast(running?'🏃 달리기 시작!':'🚶 걷기 시작!');return;}if(k==='escape'){closeDialog();return}if(dialogOpen){if(k==='e'||k==='b'||k==='i')closeDialog();return}if(k==='1')useSkill(0);if(k==='2')useSkill(1);if(k==='3')useSkill(2);if(k==='4')useSkill(3);if(k==='5')useSkill(4);if(k==='e')talk();if(k==='h')heal();if(k==='b'||k==='i')openInventory();if(k==='v')openCustomize()});cv.addEventListener('pointerdown',e=>{if(e.button!==0)return;if($('intro').style.display!=='none'||dialogOpen)return;e.preventDefault();attack()});window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;if(e.key.toLowerCase()==='c')stopReturn()});window.addEventListener('blur',()=>{keys={};stopReturn()});document.querySelectorAll('[data-key]').forEach(b=>{const k=b.dataset.key;b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}keys[k]=true});['pointerup','pointerleave','pointercancel','lostpointercapture'].forEach(t=>b.addEventListener(t,()=>keys[k]=false))});document.querySelectorAll('[data-hit]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();const actions={attack,skill1:()=>useSkill(0),skill2:()=>useSkill(1),skill3:()=>useSkill(2),skill4:()=>useSkill(3),skill5:()=>useSkill(4),talk,heal,inventory:openInventory,customize:openCustomize,run:()=>{running=!running;$('runChip').textContent=running?'🏃 달리기 ON · Shift 걷기':'🚶 걷기 · Shift 달리기 전환';$('mobileRun').classList.toggle('active',running);toast(running?'🏃 달리기 시작!':'🚶 걷기 시작!')},map:()=>$('mapBtn').click(),guide:()=>$('questNpcBtn').click(),quests:()=>$('autoSaveBtn').click(),save:()=>save(true),resign:handleResignPlus};if($('intro').style.display!=='none'&&b.dataset.hit!=='save')return;actions[b.dataset.hit]?.()}));const retBtn=$('mobileReturn');retBtn.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();try{retBtn.setPointerCapture(e.pointerId)}catch(_){}startReturn()});['pointerup','pointercancel','lostpointercapture'].forEach(type=>retBtn.addEventListener(type,e=>{e.preventDefault();if(returnHeld)stopReturn()}));retBtn.addEventListener('contextmenu',e=>e.preventDefault());
+makeWorld();spawnEnemies();expandMapEntities();if(load()){$('newForm').classList.add('hide');$('continueForm').classList.remove('hide');$('welcome').textContent='다시 왔구나, '+player.nick+'!';updateHUD()}else{$('continueForm').classList.add('hide')}requestAnimationFrame(loop);window.addEventListener('beforeunload',()=>save());})();
+</script></body></html>
