@@ -1,1 +1,1 @@
-GitHub hwan-rpg 저장소 main의 index.html을 교체하세요. 기존 server.js와 package.json은 그대로 두세요. 캐릭터 저장 데이터를 지우지 마세요.
+현재 GitHub 저장소의 index.html 하나만 교체하세요. 기존 server.js, package.json 및 브라우저 저장 데이터를 삭제하지 마세요. Render 배포가 완료되면 같은 주소로 접속하세요.
