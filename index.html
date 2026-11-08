@@ -630,30 +630,50 @@ function junkDealer(){
  document.querySelectorAll('[data-arrowbuy]').forEach(b=>b.onclick=()=>{const g=goods[Number(b.dataset.arrowbuy)];if(!g||player.gold<g.price)return;player.gold=Math.max(0,player.gold-g.price);player.inventory['화살']=(player.inventory['화살']||0)+g.count;toast(`🏹 화살 ${g.count}발 구매! 현재 ${player.inventory['화살']}발`);log(`잡화상인에게 화살 ${g.count}발 구매 · ${g.price}G`);save();junkDealer()});
  document.querySelectorAll('[data-sell],[data-sellall]').forEach(b=>b.onclick=()=>{const n=MATERIALS[Number(b.dataset.sell??b.dataset.sellall)];const qty=b.hasAttribute('data-sellall')?player.inventory[n]||0:1;if(!qty||!player.inventory[n])return;player.inventory[n]-=qty;player.gold+=qty*SELL_PRICES[n];toast('🪙 '+n+' '+qty+'개 판매: +'+(qty*SELL_PRICES[n])+'G');save();junkDealer()});
 }
+function teleportToDestination(dest){
+ if(!player||!dest)return;
+ player.inventory=player.inventory||{};
+ if((Number(player.inventory['순간이동 지도'])||0)<1){toast('🗺️ 순간이동 지도를 먼저 구매해야 해!');return}
+ if((Number(player.inventory['순간이동 종이'])||0)<1){toast('📜 순간이동 종이가 부족해!');return}
+ const oldX=player.x,oldY=player.y;
+ const targetX=clamp(Number(dest.x)+95,35,worldWidth-35),targetY=clamp(Number(dest.y)+100,35,worldHeight-35);
+ if(!Number.isFinite(targetX)||!Number.isFinite(targetY)){toast('목적지 위치를 찾지 못했어!');return}
+ // Move only after all checks pass; do not spend the scroll on a failed attempt.
+ player.inventory['순간이동 종이']=Math.max(0,Number(player.inventory['순간이동 종이'])-1);
+ player.secretRoom=false;player.x=targetX;player.y=targetY;
+ cam.x=clamp(player.x-W/2,0,Math.max(0,worldWidth-W));cam.y=clamp(player.y-H/2,0,Math.max(0,worldHeight-H));
+ projectiles.length=0;player.reviveProtection=performance.now()+2800;
+ closeDialog();
+ particle(player.x,player.y,'#aeefff',90,9);floatText(player.x,player.y-105,'✦ 차원 이동 ✦','#ddf9ff');
+ motionFX.push({x:player.x,y:player.y,at:performance.now(),kind:2,job:1,color:'#75eeff',skillName:'차원 이동',variant:4});
+ updateHUD();save();toast('📜 '+dest.name+' 근처로 순간이동! (남은 종이 '+player.inventory['순간이동 종이']+'장)');
+ log('🗺️ '+Math.round(Math.hypot(player.x-oldX,player.y-oldY))+'m 이동 · '+dest.name);
+}
 function openTeleportMenu(){
  if(!player||$('intro').style.display!=='none')return;
- if(!player.inventory?.['순간이동 지도']){toast('🗺️ 잡화상인에게 순간이동 지도를 먼저 사야 해!');return}
- if(!(player.inventory['순간이동 종이']>0)){toast('📜 순간이동 종이가 없어! 잡화상인에게 사 와.');return}
- const places=[];
+ const inventory=player.inventory=player.inventory||{};
+ if((Number(inventory['순간이동 지도'])||0)<1){toast('🗺️ 잡화상인에게 순간이동 지도를 사야 해!');return}
+ if((Number(inventory['순간이동 종이'])||0)<1){toast('📜 잡화상인에게 순간이동 종이를 사야 해!');return}
+ const places=[{name:'🏘️ 이장 마을',x:340,y:355}];
+ // NPCs and all monsters can be targets. The list is stable, even when a nearby mob is respawning.
+ for(const n of NPCS)places.push({name:'👤 '+n.name,x:n.x,y:n.y});
  for(let i=0;i<ENEMY_TYPES.length;i++){
-  const type=ENEMY_TYPES[i],near=enemies.filter(e=>e.type===i && e.alive);
-  if(!near.length)continue;
-  near.sort((a,b)=>dist(a,player)-dist(b,player));
-  places.push({name:'👾 '+type.name+' · Lv.'+type.lv,x:near[0].x,y:near[0].y});
+  const type=ENEMY_TYPES[i];let selected=null,shortest=Infinity;
+  for(const e of enemies){if(e.type!==i)continue;const d=dist(e,player);if(d<shortest){shortest=d;selected=e}}
+  if(selected)places.push({name:'👾 '+type.name+' · Lv.'+type.lv,x:selected.homeX??selected.x,y:selected.homeY??selected.y});
  }
- for(const n of NPCS){if(n.id==='trainer'||n.id==='quest'||n.id==='mayor'||n.id==='forge'||n.id==='junkdealer'||n.id==='merchant'||n.id==='weaponseller'||n.id==='armorseller'||n.id==='bard'||n.id==='master')places.push({name:'👤 '+n.name,x:n.x,y:n.y});}
- places.unshift({name:'🏘️ 이장 마을',x:340,y:355});
- showDialog('📜 순간이동 지도',`보유 종이: <b>${player.inventory['순간이동 종이']}장</b><br>순간이동마다 종이 1장이 소모돼. 비밀 공간은 지도로 이동할 수 없어.<br><br><select id="teleportPick" style="width:100%;padding:12px;border-radius:9px;background:#1c3440;color:white;max-width:100%">${places.map((p,i)=>`<option value="${i}">${p.name}</option>`).join('')}</select>`,[['📜 순간이동하기',()=>{
- const idx=Number($('teleportPick')?.value),dest=places[idx];if(!dest)return;
- if((player.inventory['순간이동 종이']||0)<1){toast('종이가 부족해!');return}
- player.inventory['순간이동 종이']--;
- player.secretRoom=false;
- // Stay near the destination, without spawning directly inside an enemy.
- player.x=clamp(dest.x+115,50,worldWidth-50);player.y=clamp(dest.y+92,50,worldHeight-50);cam.x=clamp(player.x-W/2,0,worldWidth-W);cam.y=clamp(player.y-H/2,0,worldHeight-H);projectiles.length=0;
- player.reviveProtection=performance.now()+2500;
- particle(player.x,player.y,'#c3e7ff',85,10);floatText(player.x,player.y-85,'📜 순간이동!','#c9efff');
- closeDialog();save();updateHUD();toast(dest.name+' 근처에 도착!');
-}],['취소',closeDialog]]);
+ const html=`<p>🗺️ 원하는 목적지를 <b>직접 누르면 바로 순간이동</b>해! 이동할 때 📜 종이 1장을 사용해.</p><p>남은 종이: <b>${inventory['순간이동 종이']}장</b> · 이동 후 2.8초 무적</p><input id="teleportFilter" placeholder="🔍 몬스터 또는 NPC 이름 검색" style="box-sizing:border-box;width:100%;padding:12px;background:#102c39;border:1px solid #7195b1;color:white;border-radius:8px;margin-bottom:8px"/><div id="teleportPlaces" style="max-height:42vh;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:8px;touch-action:pan-y"></div>`;
+ showDialog('🗺️ 순간이동 지도',html,[['취소',closeDialog]]);
+ const list=$('teleportPlaces'),filter=$('teleportFilter');
+ const drawList=()=>{
+  const query=(filter.value||'').trim().toLocaleLowerCase();list.replaceChildren();
+  let matches=0;
+  places.forEach(dest=>{if(query&&!dest.name.toLocaleLowerCase().includes(query))return;matches++;
+   const btn=document.createElement('button');btn.type='button';btn.textContent=dest.name;btn.style.cssText='text-align:left;min-height:44px;white-space:normal;padding:10px 8px;border-radius:8px;background:#1e4354;color:#f0faff;border:1px solid #5b8793;cursor:pointer';
+   btn.addEventListener('click',()=>teleportToDestination(dest));list.appendChild(btn);
+  });if(!matches){const msg=document.createElement('p');msg.textContent='검색 결과가 없어.';list.appendChild(msg)}
+ };
+ filter.addEventListener('input',drawList);drawList();
 }
 function forgeMenu(){
  const wp=(player.weapons||[]).filter(w=>w!=='맨손');
@@ -821,6 +841,50 @@ function drawHuman(x,y,color,scale=1,hero=false){
 function drawEntities(){for(const n of NPCS){if(n.x<cam.x-150||n.x>cam.x+W+150||n.y<cam.y-150||n.y>cam.y+H+150)continue;if(n.id==='trainer'){let xx=n.x-cam.x,yy=n.y-cam.y;ctx.strokeStyle='#ffcf67';ctx.lineWidth=3;ctx.beginPath();ctx.arc(xx,yy+3,29+Math.sin(frame*.055)*3,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#ffde82';ctx.beginPath();ctx.moveTo(xx,yy-94);ctx.lineTo(xx-9,yy-77);ctx.lineTo(xx+9,yy-77);ctx.fill()}drawHuman(n.x,n.y,n.color,1.05,false);ctx.fillStyle='#071422d9';ctx.font='bold 15px system-ui';ctx.textAlign='center';let x=n.x-cam.x,y=n.y-cam.y;ctx.fillRect(x-77,y-49,154,24);ctx.fillStyle='#ffe5a6';ctx.fillText(n.name,x,y-32);if(player&&dist(player,n)<140){ctx.fillStyle='#ffffff';ctx.font='bold 13px system-ui';ctx.fillText('E 대화',x,y-61)}}for(const e of enemies){if(!e.alive||e.x<cam.x-150||e.x>cam.x+W+150||e.y<cam.y-150||e.y>cam.y+H+150)continue;let t=e.raidBoss?{color:e.raidColor,icon:e.raidIcon,name:e.raidName}:e.boss?{color:'#ecb55d',icon:'👁️',name:'혼돈의 수호자'}:ENEMY_TYPES[e.type];drawSprite(e.x,e.y,e.flash>0?'#ffffff':t.color,e.raidBoss?e.raidIcon:(e.boss?'👹':t.icon),(e.boss||e.raidBoss)?2:1);let x=e.x-cam.x,y=e.y-cam.y,w=(e.boss||e.raidBoss)?112:48;ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillStyle=e.lv>player.lv?'#ff9b9b':'#ecf8df';ctx.fillText('Lv.'+e.lv+' '+t.name,x,y-((e.boss||e.raidBoss)?108:52));if(e.hp<e.maxHp||e.boss||e.raidBoss){ctx.fillStyle='#130b19';ctx.fillRect(x-w/2,y-((e.boss||e.raidBoss)?84:45),w,7);ctx.fillStyle=(e.boss||e.raidBoss)?'#ff9c6c':'#f46f79';ctx.fillRect(x-w/2,y-((e.boss||e.raidBoss)?84:45),w*(e.hp/e.maxHp),7)}if(e.boss||e.raidBoss){ctx.fillStyle='#ffe1a0';ctx.textAlign='center';ctx.font='bold 19px system-ui';ctx.fillText('⚠ '+(e.raidBoss?e.raidName:'혼돈의 수호자'),x,y-98)}}if(player){drawHuman(player.x,player.y,(player.job>=0?JOBS[player.job][3]:'#78c7fa'),1.18,true);let x=player.x-cam.x,y=player.y-cam.y;ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillStyle='#101625';ctx.fillRect(x-67,y-64,134,23);ctx.fillStyle='#fff2ba';ctx.fillText(player.nick+' · Lv.'+player.lv,x,y-47);ctx.fillStyle='#ffdb82';ctx.fillRect(x-30,y-37,60*player.hp/player.maxHp,4)}}
 function renderMinimap(){let c=$('minimap'),m=c.getContext('2d'),w=c.width,h=c.height; m.clearRect(0,0,w,h);m.fillStyle='#183b3c';m.fillRect(0,0,w,h);m.fillStyle='#6c9360';m.fillRect(0,0,7,6);for(const r of REGIONS){m.fillStyle=r.color;m.fillRect(r.x/worldWidth*w,r.y/worldHeight*h,r.w/worldWidth*w,r.h/worldHeight*h)}m.strokeStyle='#678b8a';m.strokeRect(1,1,w-2,h-2);for(let n of NPCS){if(n.id!=='trainer'&&n.id!=='quest'&&n.id!=='forge'&&n.id!=='junkdealer')continue;m.fillStyle=n.id==='trainer'?'#f5cf74':n.id==='forge'?'#ff916c':n.id==='junkdealer'?'#f0dc8c':'#8fe4ae';m.beginPath();m.arc(n.x/worldWidth*w,n.y/worldHeight*h,2.5,0,7);m.fill()}m.strokeStyle='#9ad5ff';m.strokeRect(cam.x/worldWidth*w,cam.y/worldHeight*h,W/worldWidth*w,H/worldHeight*h);m.fillStyle='#fff';m.beginPath();m.arc(player.x/worldWidth*w,player.y/worldHeight*h,4,0,7);m.fill();m.font='bold 10px sans-serif';m.fillText('금색: 전직관 / 초록색: 의뢰 NPC',6,h-7)}
 const FX_GLYPHS=['⚔','✦','➶','✧','✚','✊','♆','❀','⚗','♫','⚙','☠','🐾','✚','☽','⚔','❁','◇','🎯','✿'];
+function drawIdentifiedSkill(m,t,x,y){
+ const name=String(m.skillName||'');
+ const ownJob=careerForSkill(name),j=ownJob===HIDDEN_JOB?Math.max(0,m.job||0):ownJob;
+ const list=CAREER_SKILLS[j]||[],stage=Math.max(0,list.indexOf(name));
+ let hash=2166136261;for(const c of name){hash^=c.charCodeAt(0);hash=Math.imul(hash,16777619)}hash>>>=0;
+ const fused=name.startsWith('융합 · '),special=name==='무형의 파동',family=special?10:fused?11:(j%10);
+ const p=Math.min(1,t/1.35),fade=(1-p)*(1-p*.25),turn=(hash%2?-1:1),rot=turn*(p*2.8+(hash%360)*Math.PI/180);
+ const amp=(stage+1)*17+(hash%29),r=38+p*(100+amp),col=m.color||JOBS[j]?.[3]||'#a9d5ff';
+ ctx.save();ctx.translate(x,y-18);ctx.globalAlpha*=fade;ctx.shadowBlur=24+stage*8;ctx.shadowColor=col;ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=3+stage*1.4;ctx.lineCap='round';ctx.lineJoin='round';
+ const line=(x1,y1,x2,y2)=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()};
+ const orb=(cx,cy,rad)=>{ctx.beginPath();ctx.arc(cx,cy,rad,0,Math.PI*2);ctx.fill()};
+ const ring=(rad,a=0,b=Math.PI*2)=>{ctx.beginPath();ctx.arc(0,0,rad,a,b);ctx.stroke()};
+ const poly=(sides,rad,angle=0)=>{ctx.beginPath();for(let i=0;i<=sides;i++){let a=angle+i*Math.PI*2/sides;let xx=Math.cos(a)*rad,yy=Math.sin(a)*rad;if(!i)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}ctx.stroke()};
+ ctx.rotate(rot*.22);const rays=5+stage*3+(hash%4);
+ if(family===0){ // swords: slashing arcs, different direction and width per skill
+  ctx.lineWidth=7+stage*3;for(let k=0;k<1+stage;k++){ctx.beginPath();ctx.arc(0,0,r-k*21,rot*.2-2.8+k*.33,rot*.2+.28+k*.33);ctx.stroke()}line(-r*.85,30+stage*6,r*.82,-r*.38);
+ }else if(family===1){ // mage: multi-polygon spell sigils
+  ctx.rotate(-rot*.7);poly(3+stage*2,r*.8,rot);poly(6+stage,r*.46,-rot);for(let i=0;i<rays;i++){let a=i*2*Math.PI/rays;orb(Math.cos(a)*r*.83,Math.sin(a)*r*.83,4+stage)}
+ }else if(family===2){ // arrows: arrowheads fired in spread
+  for(let i=-2-stage;i<=2+stage;i++){let yy=i*18;line(-r*.9,yy*.5,r*.8,yy);line(r*.8,yy,r*.61,yy-11);line(r*.8,yy,r*.61,yy+11)}
+ }else if(family===3){ // assassin: phantom silhouettes and crossing blades
+  for(let i=0;i<3+stage*2;i++){let a=i*2*Math.PI/(3+stage*2)+rot;ctx.save();ctx.translate(Math.cos(a)*r*.75,Math.sin(a)*r*.6);ctx.rotate(a);ctx.strokeRect(-9,-23,18,46);line(-16,-25,18,25);ctx.restore()}
+ }else if(family===4){ // sacred / healing: star pillars and crosses
+  for(let i=0;i<rays;i++){let a=i*2*Math.PI/rays;ctx.save();ctx.rotate(a);line(0,-r*.42,0,-r);line(-9,-r*.7,9,-r*.7);ctx.restore()}ctx.fillStyle='#fff2bf';orb(0,0,10+stage*4);
+ }else if(family===5){ // fists: expanding impact cracks
+  poly(5+stage,r*.72,rot);for(let i=0;i<rays;i++){let a=i*2*Math.PI/rays;line(Math.cos(a)*r*.3,Math.sin(a)*r*.3,Math.cos(a)*r,Math.sin(a)*r)}
+ }else if(family===6){ // spears: pointed lances of different counts
+  for(let i=0;i<3+stage*2;i++){let a=rot+i*2*Math.PI/(3+stage*2);ctx.save();ctx.rotate(a);line(-r*.3,0,r*.85,0);line(r*.85,0,r*.58,-r*.12);line(r*.85,0,r*.58,r*.12);ctx.restore()}
+ }else if(family===7){ // nature/spirits: leaf petal swirls
+  for(let i=0;i<8+stage*4;i++){let a=i*2*Math.PI/(8+stage*4)+rot;ctx.save();ctx.rotate(a);ctx.translate(0,-r*.8);ctx.beginPath();ctx.ellipse(0,0,8+stage*2,22+stage*3,a,0,7);ctx.stroke();ctx.restore()}
+ }else if(family===8){ // alchemy: bubbles and flasks
+  for(let i=0;i<11+stage*8;i++){let a=(i*2.399)+rot,rr=r*(.22+(i%6)*.12);ctx.beginPath();ctx.arc(Math.cos(a)*rr,Math.sin(a)*rr,3+(i%5)*2,0,7);ctx.stroke()}ctx.strokeRect(-r*.27,-r*.45,r*.54,r*.85);
+ }else if(family===9){ // bard: music notes in spirals
+  ctx.font=`bold ${36+stage*12}px sans-serif`;ctx.textAlign='center';for(let i=0;i<3+stage;i++){let a=i*2*Math.PI/(3+stage)+rot;ctx.fillText(['♫','♪','♬'][i%3],Math.cos(a)*r*.75,Math.sin(a)*r*.75)}
+ }else if(family===10){ // hidden first wave: three gigantic iridescent phase blades
+  ctx.strokeStyle='#e5aaff';ctx.lineWidth=8;for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(0,0,r*(.5+i*.27),r*(.18+i*.09),i*Math.PI/3+rot,0,Math.PI*2);ctx.stroke()}ctx.fillStyle='#ffffff';orb(0,0,16+stage*8);
+ }else{ // fusion: several interacting, overlapping sigils
+  ctx.strokeStyle='#fff0a3';poly(3,r,rot);ctx.strokeStyle='#c99cff';poly(5,r*.78,-rot);ctx.strokeStyle='#8fe9ff';poly(8,r*.52,rot*1.7);for(let i=0;i<7;i++){let a=i*2*Math.PI/7+rot;orb(Math.cos(a)*r*.9,Math.sin(a)*r*.9,6)}
+ }
+ // Final per-name rune, shape and movement vary even within the same class.
+ const runes=['✦','✧','❋','✺','☄','◆','❖','✿','✶','⚡','☾','❃'];const emblem=runes[hash%runes.length];
+ ctx.rotate(-rot*.22);ctx.globalAlpha*=Math.min(1,.45+fade);ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.font=`bold ${23+stage*6}px sans-serif`;ctx.fillText(emblem,0,-20-stage*8);
+ ctx.restore();
+}
 function careerVisual(m,t,x,y){
  const j=Math.max(0,m.job||0),tier=Math.max(0,m.kind||0),phase=Math.max(0,Math.min(1,t/1.35));
  const c=m.color||JOBS[j]?.[3]||'#a8eeff',fade=Math.pow(1-phase,1.25),power=1+tier*.24;
@@ -954,10 +1018,10 @@ $('monsterFindForm').addEventListener('submit',e=>{
 });
 $('monsterClear').addEventListener('click',()=>clearMonsterNav('🧭 길찾기를 취소했어.'));
 function render(){ctx.clearRect(0,0,W,H);if(!player){ctx.fillStyle='#254e56';ctx.fillRect(0,0,W,H);return}if(player.secretRoom){drawSecretRoom();return}cam.x+=(clamp(player.x-W/2,0,worldWidth-W)-cam.x)*.16;cam.y+=(clamp(player.y-H/2,0,worldHeight-H)-cam.y)*.16;drawGround();drawEntities();drawWolf();onlineDrawPlayers();ctx.save();ctx.translate(-cam.x,-cam.y);for(const p of projectiles){ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,8,0,7);ctx.fill()}for(const p of particles){ctx.globalAlpha=clamp(p.life/.7,0,1);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,7);ctx.fill()}ctx.globalAlpha=1;for(const f of floats){ctx.globalAlpha=clamp(f.life,0,1);ctx.font='bold 18px system-ui';ctx.textAlign='center';ctx.fillStyle='#0d1826';ctx.fillText(f.text,f.x+1,f.y+1);ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y)}ctx.restore();ctx.globalAlpha=1;
- motionFX=motionFX.filter(m=>performance.now()-m.at<1450);
- for(const m of motionFX){const t=(performance.now()-m.at)/1000,x=m.x-cam.x,y=m.y-cam.y,alpha=Math.max(0,1-t/1.15);if(x<-110||x>W+110||y<-110||y>H+110)continue;
+ motionFX=motionFX.filter(m=>performance.now()-m.at<1600);
+ for(const m of motionFX){const t=(performance.now()-m.at)/1000,x=m.x-cam.x,y=m.y-cam.y,alpha=Math.max(0,1-t/1.15);if(x<-330||x>W+330||y<-330||y>H+330)continue;
  ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=m.color;ctx.shadowColor=m.color;ctx.shadowBlur=20;ctx.lineCap='round';
- careerVisual(m,t,x,y);
+ if(m.skillName)drawIdentifiedSkill(m,t,x,y);else careerVisual(m,t,x,y);
  ctx.restore();}
  trainerDemos=trainerDemos.filter(d=>performance.now()-d.at<2600);
  for(const d of trainerDemos){const age=(performance.now()-d.at)/2600,x=d.x-cam.x,y=d.y-cam.y;

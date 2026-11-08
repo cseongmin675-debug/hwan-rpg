@@ -1,0 +1,8 @@
+환 RPG 기존 Render 서버 주소 유지 업데이트
+
+1. 캐릭터 기록을 게임 안에서 먼저 백업하세요.
+2. ZIP에서 index.html을 압축 해제하세요.
+3. GitHub cseongmin675-debug/hwan-rpg 저장소의 루트 index.html 파일을 새 파일로 교체하세요.
+4. Commit changes를 누르면 Render가 자동 재배포합니다. 자동 배포가 꺼져 있다면 Deploy latest commit을 실행하세요.
+5. 새 버전에서 P키를 눌러 목록에서 목적지를 직접 클릭하세요. 지도와 종이가 모두 필요합니다.
+서버 파일(server.js/package.json)은 변경할 필요가 없습니다.
