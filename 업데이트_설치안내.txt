@@ -1,0 +1,1 @@
+게임 파일은 index.html 입니다. GitHub 저장소 hwan-rpg의 index.html을 교체하고 Commit changes 후 Render 배포를 확인하세요. 기존 캐릭터 로컬 저장은 삭제하지 마세요.
