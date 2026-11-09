@@ -700,18 +700,26 @@ function secretKill(type){
 function careerMaterialCount(name){return Math.max(0,Number(player?.careerMaterialEarned?.[name])||0,Number(player?.inventory?.[name])||0)}
 function secretReady(q){return secretRequirement.every((r,i)=>(q.kills[i]||0)>=r.need)&&careerMaterialCount('마력 광석')>=3&&careerMaterialCount('용의 비늘')>=2}
 function secretTaskHTML(q){return '<div class="training">'+secretRequirement.map((r,i)=>`${r.label} ${Math.min(r.need,q.kills[i]||0)}/${r.need}마리`).join('<br>')+`<br>마력 광석 누적 획득 ${Math.min(3,careerMaterialCount('마력 광석'))}/3개<br>용의 비늘 누적 획득 ${Math.min(2,careerMaterialCount('용의 비늘'))}/2개<br><small>획득한 재료는 판매해도 인정돼.</small></div>`}
-function secretCorner(){
- if(!player.secretRoom){enterSecretRoom();return;}
+function secretAwakeningTrial(){
  const q=secretState();
- if(player.job===HIDDEN_JOB){
-  if(player.stage===1){
-   if(player.lv<30){showDialog('희미한 속삭임','더 깊은 힘은 30레벨에 이르러야 열릴 것 같다.',[['물러난다',closeDialog]]);return}
    if(q.status!=='awaken')q.status='awaken';
        const trial=q.trialKills||[0,0,0],required=[24,18,16];
     if(required.some((need,i)=>(trial[i]||0)<need)||
        careerMaterialCount('용암 핵')<4||careerMaterialCount('망령의 조각')<3){
       showDialog('갈라진 차원의 틈',`첫 시험보다 더 혹독한 차원의 시련이다.<div class="training">🐉 푸른 드레이크 ${trial[0]||0}/24<br>🌋 용암 정령 ${trial[1]||0}/18<br>👻 그림자 망령 ${trial[2]||0}/16<br>용암 핵 누적 획득 ${Math.min(4,careerMaterialCount('용암 핵'))}/4<br>망령의 조각 누적 획득 ${Math.min(3,careerMaterialCount('망령의 조각'))}/3<br><small>획득한 재료는 판매해도 인정돼.</small></div>`,[['시련을 이어 간다',()=>{closeDialog();save()}]]);return;}
 showDialog('갈라진 차원의 틈','힘의 경계가 무너지고 있어. 2차 전직 후에는 위기에서 무작위 기술이 진화한다.',[['... 2차 전직',()=>{/* 재료 획득 이력이 인정되므로 전직 때 재료를 차감하지 않는다. */player.stage=2;player.finalJob='...';q.status='awakened';player.maxHp+=100;player.maxMp+=80;player.hp=player.maxHp;player.mp=player.maxMp;particle(player.x,player.y,'#d6acff',130,13);floatText(player.x,player.y-75,'✦ 두 번째 각성','#eecbff');closeDialog();save();updateHUD()}],['아직은 아니다',closeDialog]]);return
+}
+function secretCorner(){
+ if(!player.secretRoom){enterSecretRoom();return;}
+ const q=secretState();
+ if(player.job===HIDDEN_JOB){
+  if(player.stage===1){
+   showDialog('✦ 히든 전직관 · 차원의 균열',
+    '이제 30레벨까지 기다릴 필요가 없어. <b>5레벨부터 스킬 합성 미션</b>에 도전할 수 있다.<br><br>미션을 모두 깨면 스킬 합성 기술을 영구 습득할 수 있다.',
+    [['✨ 스킬 합성 미션',()=>fusionTrialMenu()],
+     ['👑 2차 각성 시련',()=>secretAwakeningTrial()],
+     ['닫기',closeDialog]]);
+   return;
   }
   if(!player.fusionUnlocked){fusionTrialMenu();return}
  showDialog('차원의 균열','배운 기술 2~3개를 결합하는 비술을 익혔구나. 다른 전직관에게서는 그 직업의 스킬만 배울 수 있다.',[['✨ 스킬 합성하기',()=>secretFuseMenu()],['물러난다',closeDialog]]);return;
