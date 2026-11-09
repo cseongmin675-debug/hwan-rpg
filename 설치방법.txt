@@ -1,2 +1,1 @@
-GitHub의 hwan-rpg 저장소에서 index.html 파일을 이 파일로 교체한 뒤 Commit changes를 누르세요.
-그 후 Render에서 자동 배포 또는 Manual Deploy -> Deploy latest commit을 실행하면 됩니다.
+환 RPG GitHub 저장소에서 index.html을 이 파일로 교체한 다음 Commit changes를 누르세요. Render 배포를 확인하세요. 기존 브라우저 저장 데이터를 삭제하지 마세요.
