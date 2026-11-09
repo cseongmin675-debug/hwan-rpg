@@ -1,1 +1,2 @@
-환 RPG GitHub 저장소에서 index.html을 이 파일로 교체한 다음 Commit changes를 누르세요. Render 배포를 확인하세요. 기존 브라우저 저장 데이터를 삭제하지 마세요.
+기존 환 RPG 파일을 유지한 업데이트입니다. GitHub에서 index.html 교체 후 Commit changes, Render 배포 확인. 브라우저 저장 데이터 삭제 금지.
+히든 직업 ... 선택 상태일 때 B키 배낭의 스킬 배우기에서 기술 선택 후 배울 수 있습니다.
