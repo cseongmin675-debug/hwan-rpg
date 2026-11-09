@@ -605,8 +605,13 @@ function drawSkeletons(){for(const a of skeletonArmy){const x=a.x-cam.x,y=a.y-ca
   ctx.beginPath();ctx.moveTo(0,-14);ctx.lineTo(0,2);ctx.moveTo(-11,-8);ctx.lineTo(11,-8);ctx.moveTo(0,2);ctx.lineTo(-10+walk,17);ctx.moveTo(0,2);ctx.lineTo(10-walk,17);ctx.stroke();
   ctx.fillStyle='#a46adf';ctx.fillRect(-5,-26,3,3);ctx.fillRect(3,-26,3,3);
  }
- ctx.fillStyle='#0e1729cc';ctx.fillRect(-57,-58,114,17);
- ctx.textAlign='center';ctx.fillStyle='#f1e5ff';ctx.font='bold 11px sans-serif';ctx.fillText('💀 '+a.kind.slice(0,10)+' · HP '+Math.ceil(a.hp),0,-46);
+ const maxHp=Math.max(1,Number(a.maxHp)||1),curHp=Math.max(0,Math.min(maxHp,Number(a.hp)||0));
+ const ratio=curHp/maxHp,barW=104,barY=-62;
+ ctx.fillStyle='#07101ddf';ctx.fillRect(-barW/2-3,barY-3,barW+6,28);
+ ctx.fillStyle='#1c2734';ctx.fillRect(-barW/2,barY,barW,9);
+ ctx.fillStyle=ratio>.5?'#67e5a7':ratio>.25?'#f7c869':'#fa747b';ctx.fillRect(-barW/2,barY,barW*ratio,9);
+ ctx.strokeStyle='#e9e3ff88';ctx.lineWidth=1;ctx.strokeRect(-barW/2,barY,barW,9);
+ ctx.textAlign='center';ctx.fillStyle='#f1e5ff';ctx.font='bold 10px sans-serif';ctx.fillText('💀 '+String(a.kind||'해골').slice(0,11)+'  '+Math.ceil(curHp)+'/'+Math.ceil(maxHp),0,barY+19);
  ctx.restore();}}
 function sameRealm(e){return !!e.ocean===!!player.oceanAccess}
 // 12 consecutive sea-story chapters with rewards.
@@ -957,25 +962,47 @@ function openTeleportMenu(){
  const inventory=player.inventory=player.inventory||{};
  if((Number(inventory['순간이동 지도'])||0)<1){toast('🗺️ 잡화상인에게 순간이동 지도를 사야 해!');return}
  if((Number(inventory['순간이동 종이'])||0)<1){toast('📜 잡화상인에게 순간이동 종이를 사야 해!');return}
- const places=[{name:'🏘️ 이장 마을',x:340,y:355},{name:'🌊 잊힌 심해 왕국 입구 · 바다 스토리 12장',x:OCEAN.x+180,y:OCEAN.y+160,ocean:true}];
- for(const e of enemies){if(e.raidBoss)places.push({name:'👑 보스 · '+e.raidName+' · Lv.'+e.lv,x:e.homeX,y:e.homeY,ocean:!!e.ocean});}
- // NPCs and all monsters can be targets. The list is stable, even when a nearby mob is respawning.
- for(const n of NPCS)places.push({name:'👤 '+n.name,x:n.x,y:n.y});
- for(let i=0;i<ENEMY_TYPES.length;i++){
-  const type=ENEMY_TYPES[i];let selected=null,shortest=Infinity;
-  for(const e of enemies){if(e.type!==i)continue;const d=dist(e,player);if(d<shortest){shortest=d;selected=e}}
-  if(selected)places.push({name:(selected.ocean?'🌊 ':'👾 ')+type.name+' · Lv.'+type.lv,x:selected.homeX??selected.x,y:selected.homeY??selected.y,ocean:!!selected.ocean});
+ const places=[];
+ const groupOrder=['🏘️ 이장 마을','❄️ 설원','🏜️ 황금 사막','🌋 화산 지대','🪷 안개 습지','🪨 메아리 협곡','🌸 벚꽃 언덕','🌊 잊힌 심해 왕국','🌲 초원·숲·기타 지역','👤 NPC·전직관'];
+ const zoneFor=(x,y,ocean)=>{
+  if(ocean||inOcean(x,y))return '🌊 잊힌 심해 왕국';
+  for(const r of REGIONS){if(x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h)return r.name;}
+  return '🌲 초원·숲·기타 지역';
+ };
+ places.push({name:'🏘️ 이장 마을',x:340,y:355,group:groupOrder[0]});
+ places.push({name:'🌊 잊힌 심해 왕국 입구 · 바다 스토리 12장',x:OCEAN.x+180,y:OCEAN.y+160,ocean:true,group:groupOrder[7]});
+ for(const e of enemies){if(e.raidBoss)places.push({name:'👑 보스 · '+e.raidName+' · Lv.'+e.lv,x:e.homeX,y:e.homeY,ocean:!!e.ocean,group:zoneFor(e.homeX,e.homeY,!!e.ocean),boss:true});}
+ for(const n of NPCS)places.push({name:'👤 '+n.name,x:n.x,y:n.y,group:groupOrder[9]});
+ // Spawn records identify the region in which each monster actually exists.
+ // A monster present in multiple regions is listed under each relevant region once.
+ const known=new Set();
+ for(const e of enemies){
+  if(e.type<0||e.type>=ENEMY_TYPES.length)continue;
+  const type=ENEMY_TYPES[e.type];const x=e.homeX??e.x,y=e.homeY??e.y;
+  const grp=zoneFor(x,y,!!e.ocean);const key=grp+'|'+e.type;
+  if(known.has(key))continue;known.add(key);
+  places.push({name:(e.ocean?'🌊 ':'👾 ')+type.name+' · Lv.'+type.lv,x,y,ocean:!!e.ocean,group:grp});
  }
- const html=`<p>🗺️ 원하는 목적지를 <b>직접 누르면 바로 순간이동</b>해! 이동할 때 📜 종이 1장을 사용해.</p><p>남은 종이: <b>${inventory['순간이동 종이']}장</b> · 이동 후 2.8초 무적</p><input id="teleportFilter" placeholder="🔍 몬스터 또는 NPC 이름 검색" style="box-sizing:border-box;width:100%;padding:12px;background:#102c39;border:1px solid #7195b1;color:white;border-radius:8px;margin-bottom:8px"/><div id="teleportPlaces" style="max-height:42vh;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:8px;touch-action:pan-y"></div>`;
- showDialog('🗺️ 순간이동 지도',html,[['취소',closeDialog]]);
+ const html=`<p>🗺️ <b>지역별 몬스터·보스</b>를 눌러 바로 순간이동할 수 있어. 📜 종이 1장 소모.</p><p>남은 종이: <b>${Number(inventory['순간이동 종이'])}장</b> · 이동 후 2.8초 무적</p><input id="teleportFilter" placeholder="🔍 지역·몬스터·보스·NPC 검색" style="box-sizing:border-box;width:100%;padding:12px;background:#102c39;border:1px solid #7195b1;color:white;border-radius:8px;margin-bottom:8px"/><div id="teleportPlaces" style="max-height:48vh;overflow-y:auto;touch-action:pan-y"></div>`;
+ showDialog('🗺️ 지역별 순간이동 지도',html,[['취소',closeDialog]]);
  const list=$('teleportPlaces'),filter=$('teleportFilter');
  const drawList=()=>{
   const query=(filter.value||'').trim().toLocaleLowerCase();list.replaceChildren();
-  let matches=0;
-  places.forEach(dest=>{if(query&&!dest.name.toLocaleLowerCase().includes(query))return;matches++;
-   const btn=document.createElement('button');btn.type='button';btn.textContent=dest.name;btn.style.cssText='text-align:left;min-height:44px;white-space:normal;padding:10px 8px;border-radius:8px;background:#1e4354;color:#f0faff;border:1px solid #5b8793;cursor:pointer';
-   btn.addEventListener('click',()=>teleportToDestination(dest));list.appendChild(btn);
-  });if(!matches){const msg=document.createElement('p');msg.textContent='검색 결과가 없어.';list.appendChild(msg)}
+  let total=0;
+  for(const group of groupOrder){
+   const matches=places.filter(d=>d.group===group&&(!query||(d.name+' '+group).toLocaleLowerCase().includes(query)));
+   if(!matches.length)continue;total+=matches.length;
+   const details=document.createElement('details');details.open=!!query||group===groupOrder[0]||group===groupOrder[7];
+   details.style.cssText='border:1px solid #4c6878;border-radius:10px;margin:7px 0;background:#122c3e;overflow:hidden';
+   const head=document.createElement('summary');head.style.cssText='padding:12px;font-weight:800;cursor:pointer;color:#e9f7ff;touch-action:manipulation';
+   head.textContent=group+' ('+matches.length+'종)';details.appendChild(head);
+   const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:7px;padding:8px';
+   for(const dest of matches){const btn=document.createElement('button');btn.type='button';btn.textContent=dest.name;
+    btn.style.cssText='text-align:left;min-height:44px;white-space:normal;padding:10px 8px;border-radius:8px;background:'+(dest.boss?'#503047':'#1e4354')+';color:#f0faff;border:1px solid '+(dest.boss?'#c78ba8':'#5b8793')+';cursor:pointer;touch-action:manipulation';
+    btn.addEventListener('click',()=>teleportToDestination(dest));grid.appendChild(btn);}
+   details.appendChild(grid);list.appendChild(details);
+  }
+  if(!total){const msg=document.createElement('p');msg.textContent='검색 결과가 없어.';list.appendChild(msg);}
  };
  filter.addEventListener('input',drawList);drawList();
 }
@@ -1963,7 +1990,18 @@ function render(){ctx.clearRect(0,0,W,H);if(!player){ctx.fillStyle='#254e56';ctx
 function stopReturn(){returnHeld=false;returnStarted=0;const mob=$('mobileReturn');if(mob)mob.classList.remove('channeling');const count=$('mobileReturnPercent');if(count)count.textContent='0%';const panel=$('returnChannel');if(panel)panel.style.display='none'}
 function startReturn(){if(!player||dialogOpen||$('intro').style.display!=='none'||returnHeld)return;returnHeld=true;returnStarted=performance.now();$('mobileReturn').classList.add('channeling');$('returnChannel').style.display='block';$('returnProgress').style.width='0%';$('returnLabel').textContent='🏠 마을 귀환 준비 중… 0.0 / 4.0초';}
 function finishReturn(){if(!returnHeld)return;player.secretRoom=false;const fromX=player.x,fromY=player.y;returnArrival={x:fromX,y:fromY,at:performance.now(),type:'departure'};stopReturn();player.x=VILLAGE_RESPAWN.x;player.y=VILLAGE_RESPAWN.y;returnArrival={x:player.x,y:player.y,at:performance.now(),type:'arrival'};player.reviveProtection=performance.now()+1500;for(const e of enemies)e.atkAt=performance.now();projectiles=[];particle(player.x,player.y,'#8bfff0',38);floatText(player.x,player.y,'마을 귀환!','#b6fff1');toast('🏠 마을로 귀환했어!');log('🏠 귀환 마법으로 마을에 도착했다.');save(true);}
-function update(dt){if(!player||$('intro').style.display!=='none'||dialogOpen){if(returnHeld)stopReturn();return;}if(player.secretRoom){updateSecretRoom(dt);return;}frame++;const atCorner=player.x<105&&player.y<105;if(!atCorner&&(player.x>145||player.y>145))secretCornerLatched=false;if(atCorner&&!secretCornerLatched){secretCornerLatched=true;enterSecretRoom();return;}if(returnHeld){const elapsed=performance.now()-returnStarted;if(elapsed>=4000){finishReturn()}else{$('returnProgress').style.width=Math.min(100,elapsed/40)+'%';$('mobileReturnPercent').textContent=Math.floor(Math.min(100,elapsed/40))+'%';$('returnLabel').textContent='🏠 마을 귀환 준비 중… '+(elapsed/1000).toFixed(1)+' / 4.0초';}}const run=(running?1.55:1)*(Date.now()<(player.speedUntil||0)?1.5:1),speed=(player.job===3?235:202)*run;let dx=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),dy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);if(Math.hypot(stickX,stickY)>0.12){dx=stickX;dy=stickY}const oldOceanX=player.x,oldOceanY=player.y;if((dx||dy)&&!returnHeld){let l=Math.hypot(dx,dy);player.x=clamp(player.x+dx/Math.max(1,l)*speed*dt,20,worldWidth-20);player.y=clamp(player.y+dy/Math.max(1,l)*speed*dt,20,worldHeight-20);if(dx)player.direction=Math.sign(dx);if(inOcean(player.x,player.y)!==inOcean(oldOceanX,oldOceanY)){player.x=oldOceanX;player.y=oldOceanY;if(Math.random()<.015)toast('🌊 바다는 순간이동으로만 입장하거나 나갈 수 있어!')}}player.mp=Math.min(player.maxMp,player.mp+dt*1.9);for(const e of enemies){if(!e.alive){e.respawn-=dt;if(e.respawn<=0){e.alive=true;e.hp=e.maxHp;e.x=e.homeX;e.y=e.homeY}continue}e.flash=Math.max(0,e.flash-dt);if(!sameRealm(e))continue;const t=e.raidBoss?{speed:80,atk:e.raidAtk}:e.boss?{speed:65,atk:32}:ENEMY_TYPES[e.type],d=dist(e,player);if(d<310){if(d>45){let nx=e.x+(player.x-e.x)/d*t.speed*dt,ny=e.y+(player.y-e.y)/d*t.speed*dt;e.x=clamp(nx,e.zone.x1,e.zone.x2);e.y=clamp(ny,e.zone.y1,e.zone.y2);confineEnemy(e)}if(d<72&&performance.now()-e.atkAt>((e.boss||e.raidBoss)?850:1150)){e.atkAt=performance.now();damagePlayer(monsterAttack(e,t))}}else{e.wander+=dt;if(e.wander>2){e.wander=rand(-1,0);e.vx=rand(-1,1);e.vy=rand(-1,1)}e.x=clamp(e.x+(e.vx||0)*dt*18,e.zone.x1,e.zone.x2);e.y=clamp(e.y+(e.vy||0)*dt*18,e.zone.y1,e.zone.y2);confineEnemy(e)}}updateWolf(dt);updateSkeletons(dt);for(let i=projectiles.length-1;i>=0;i--){let p=projectiles[i];const oldX=p.x,oldY=p.y;p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;
+function update(dt){if(!player||$('intro').style.display!=='none'||dialogOpen){if(returnHeld)stopReturn();return;}if(player.secretRoom){updateSecretRoom(dt);return;}frame++;const atCorner=player.x<105&&player.y<105;if(!atCorner&&(player.x>145||player.y>145))secretCornerLatched=false;if(atCorner&&!secretCornerLatched){secretCornerLatched=true;enterSecretRoom();return;}if(returnHeld){const elapsed=performance.now()-returnStarted;if(elapsed>=4000){finishReturn()}else{$('returnProgress').style.width=Math.min(100,elapsed/40)+'%';$('mobileReturnPercent').textContent=Math.floor(Math.min(100,elapsed/40))+'%';$('returnLabel').textContent='🏠 마을 귀환 준비 중… '+(elapsed/1000).toFixed(1)+' / 4.0초';}}const run=(running?1.55:1)*(Date.now()<(player.speedUntil||0)?1.5:1),speed=(player.job===3?235:202)*run;let dx=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),dy=(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0);if(Math.hypot(stickX,stickY)>0.12){dx=stickX;dy=stickY}const oldOceanX=player.x,oldOceanY=player.y;if((dx||dy)&&!returnHeld){let l=Math.hypot(dx,dy);player.x=clamp(player.x+dx/Math.max(1,l)*speed*dt,20,worldWidth-20);player.y=clamp(player.y+dy/Math.max(1,l)*speed*dt,20,worldHeight-20);if(dx)player.direction=Math.sign(dx);if(inOcean(player.x,player.y)!==inOcean(oldOceanX,oldOceanY)){player.x=oldOceanX;player.y=oldOceanY;if(Math.random()<.015)toast('🌊 바다는 순간이동으로만 입장하거나 나갈 수 있어!')}}player.mp=Math.min(player.maxMp,player.mp+dt*1.9);for(const e of enemies){if(!e.alive){e.respawn-=dt;if(e.respawn<=0){e.alive=true;e.hp=e.maxHp;e.x=e.homeX;e.y=e.homeY}continue}e.flash=Math.max(0,e.flash-dt);if(!sameRealm(e))continue;const t=e.raidBoss?{speed:80,atk:e.raidAtk}:e.boss?{speed:65,atk:32}:ENEMY_TYPES[e.type],d=dist(e,player);if(d<310){
+ let target=player,td=d;
+ for(const sk of skeletonArmy){if(sk.hp<=0)continue;const sd=dist(e,sk);if(sd<td && sd<180){target=sk;td=sd;}}
+ if(td>45){let nx=e.x+(target.x-e.x)/Math.max(1,td)*t.speed*dt,ny=e.y+(target.y-e.y)/Math.max(1,td)*t.speed*dt;e.x=clamp(nx,e.zone.x1,e.zone.x2);e.y=clamp(ny,e.zone.y1,e.zone.y2);confineEnemy(e)}
+ const reach=dist(e,target);
+ if(reach<72&&performance.now()-e.atkAt>((e.boss||e.raidBoss)?850:1150)){
+  e.atkAt=performance.now();const dmg=monsterAttack(e,t);
+  if(target===player)damagePlayer(dmg);
+  else {target.hp=Math.max(0,target.hp-dmg);floatText(target.x,target.y-65,'-'+Math.round(dmg),'#ffa2ad');particle(target.x,target.y,'#d4baff',5);
+   if(target.hp<=0){const si=skeletonArmy.indexOf(target);if(si>=0)skeletonArmy.splice(si,1);particle(target.x,target.y,'#ece8ff',18);toast('💀 소환 해골이 쓰러졌어!');}}
+ }
+ }else{e.wander+=dt;if(e.wander>2){e.wander=rand(-1,0);e.vx=rand(-1,1);e.vy=rand(-1,1)}e.x=clamp(e.x+(e.vx||0)*dt*18,e.zone.x1,e.zone.x2);e.y=clamp(e.y+(e.vy||0)*dt*18,e.zone.y1,e.zone.y2);confineEnemy(e)}}updateWolf(dt);updateSkeletons(dt);for(let i=projectiles.length-1;i>=0;i--){let p=projectiles[i];const oldX=p.x,oldY=p.y;p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;
 let hit=false;
 if(p.target?.alive){const ax=p.target.x-oldX,ay=p.target.y-oldY,bx=p.x-oldX,by=p.y-oldY;const f=bx*bx+by*by;const u=f?clamp((ax*bx+ay*by)/f,0,1):0;hit=Math.hypot(oldX+bx*u-p.target.x,oldY+by*u-p.target.y)<34;}
 if(p.target?.alive&&hit){damageEnemy(p.target,p.dmg,p.color);projectiles.splice(i,1)}else if(p.life<0)projectiles.splice(i,1)}for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=160*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1)}for(let i=floats.length-1;i>=0;i--){floats[i].y-=40*dt;floats[i].life-=dt;if(floats[i].life<=0)floats.splice(i,1)}if(performance.now()-lastSave>12000){save();lastSave=performance.now()}}

@@ -29,3 +29,6 @@
 - 기존 2차 각성 시련은 별도 메뉴로 유지
 
 [NEW] Skeleton stats now scale to last killed monster. Hidden fusion mission progress dialog added to desktop and mobile.
+
+[소환 해골 체력바 및 지역별 순간이동]
+소환한 해골마다 현재 HP/최대 HP와 체력 게이지 표시. 몬스터 공격을 받으면 해골 체력이 감소하고 0이면 소멸. 순간이동 지도에 지역별 일반 몬스터·보스·NPC 분류와 검색 기능 추가.
