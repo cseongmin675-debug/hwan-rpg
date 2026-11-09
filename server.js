@@ -62,6 +62,7 @@ const server = http.createServer((req,res)=>{
 });
 const wss = new WebSocketServer({server,path:'/ws',maxPayload:4096});
 const players=new Map();
+const tradeOffers=new Map();
 const invites=new Map(), parties=new Map(), duels=new Map();
 const safeNum=(v,lo,hi,d=lo)=>Number.isFinite(v)?Math.min(hi,Math.max(lo,v)):d;
 const sanitizeName=s=>typeof s==='string'?s.replace(/[\x00-\x1f<>]/g,'').trim().slice(0,16):'';
@@ -149,6 +150,39 @@ wss.on('connection',(ws)=>{
       const now=Date.now();if(now-lastPartyXP<600)return;lastPartyXP=now;
       const xp=Math.floor(safeNum(data.xp,1,150,1));const group=parties.get(p.id)||[];
       for(const [s,u] of players)if(u.id!==p.id&&group.includes(u.id)&&Math.hypot(p.x-u.x,p.y-u.y)<1000)send(s,{type:'party_xp',xp});
+    } else if(data.type==='trade_sync'){
+      if(!p.name)return;
+      p.tradeGold=Math.max(0,Math.floor(Number(data.gold)||0));
+      p.tradeWeapons=Array.isArray(data.weapons)?data.weapons.filter(x=>typeof x==='string').slice(0,500):[];
+      p.tradeArmors=Array.isArray(data.armors)?data.armors.filter(x=>typeof x==='string').slice(0,500):[];
+    } else if(data.type==='trade_offer'){
+      if(!p.name)return;
+      const target=[...players].find(([socket,u])=>u.id===data.target&&socket!==ws&&u.name);
+      const kind=data.kind==='weapon'?'weapon':data.kind==='armor'?'armor':null;
+      const name=typeof data.name==='string'?data.name.slice(0,70):'';
+      const price=Number(data.price);
+      if(!target||!kind||!name||!Number.isSafeInteger(price)||price<1||price>1000000000)return;
+      const collection=kind==='weapon'?p.tradeWeapons:p.tradeArmors;
+      if(!Array.isArray(collection)||!collection.includes(name))return send(ws,{type:'social_notice',message:'먼저 아이템을 소유해야 거래 가능해'});
+      const offerId=crypto.randomUUID();tradeOffers.set(offerId,{from:p.id,to:target[1].id,kind,name,price,at:Date.now()});
+      send(target[0],{type:'trade_offer',offerId,fromName:p.name,kind,name,price});
+      send(ws,{type:'social_notice',message:'장비 거래 제안을 전달했어'});
+    } else if(data.type==='trade_decline'){
+      const o=tradeOffers.get(data.offerId);if(o?.to===p.id)tradeOffers.delete(data.offerId);
+    } else if(data.type==='trade_accept'){
+      const o=tradeOffers.get(data.offerId);if(!o||o.to!==p.id||Date.now()-o.at>60000)return;
+      tradeOffers.delete(data.offerId);
+      const seller=[...players].find(([socket,u])=>u.id===o.from);
+      if(!seller||!Number.isSafeInteger(p.tradeGold)||p.tradeGold<o.price)return send(ws,{type:'social_notice',message:'거래 실패: 골드 부족 또는 판매자 접속 종료'});
+      const items=o.kind==='weapon'?seller[1].tradeWeapons:seller[1].tradeArmors;
+      if(!Array.isArray(items)||!items.includes(o.name))return send(ws,{type:'social_notice',message:'판매자가 장비를 보유하지 않아 거래 실패'});
+      // Update the in-memory escrow snapshot before notifying both clients.
+      items.splice(items.indexOf(o.name),1);p.tradeGold-=o.price;seller[1].tradeGold+=o.price;
+      const buyerItems=o.kind==='weapon'?p.tradeWeapons:p.tradeArmors;
+      if(!Array.isArray(buyerItems)){p.tradeWeapons=p.tradeWeapons||[];p.tradeArmors=p.tradeArmors||[];}
+      (o.kind==='weapon'?p.tradeWeapons:p.tradeArmors).push(o.name);
+      send(ws,{type:'trade_complete',role:'buyer',kind:o.kind,name:o.name,price:o.price});
+      send(seller[0],{type:'trade_complete',role:'seller',kind:o.kind,name:o.name,price:o.price});
     } else if(data.type==='chat'){
       if(!p.name||typeof data.message!=='string')return;
       const now=Date.now();if(now-chatWindow>5000){chatWindow=now;chatCount=0}
