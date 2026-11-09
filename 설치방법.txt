@@ -1,9 +1,2 @@
-환 RPG - 비밀 차원 업데이트
-
-기존 GitHub hwan-rpg 저장소에 index.html, server.js, package.json을 업로드하여 같은 이름의 파일을 교체합니다.
-Render가 자동 배포되지 않으면 Manual Deploy → Deploy latest commit을 눌러주세요.
-기존 서버 주소는 그대로입니다.
-이장 마을 왼쪽 위 모서리로 들어가면 별도의 비밀 공간으로 이동합니다.
-중앙의 ... 전직관에게 가까이 다가가 E키(모바일 대화 버튼)로 대화하여 시련을 수락합니다.
-아래 출구에서 E키 또는 C키 4초 귀환으로 이장 마을에 돌아옵니다.
-기존 저장 데이터 보호를 위해 배포 전 백업을 권장합니다.
+GitHub의 hwan-rpg 저장소에서 index.html 파일을 이 파일로 교체한 뒤 Commit changes를 누르세요.
+그 후 Render에서 자동 배포 또는 Manual Deploy -> Deploy latest commit을 실행하면 됩니다.
