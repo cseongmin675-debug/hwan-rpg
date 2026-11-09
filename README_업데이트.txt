@@ -27,3 +27,5 @@
 - 마력 광석 10, 용의 비늘 20, 용암 핵 15, 망령의 조각 15 누적 획득
 - 모든 조건 만족 시 '스킬 합성 습득'으로 영구 해금
 - 기존 2차 각성 시련은 별도 메뉴로 유지
+
+[NEW] Skeleton stats now scale to last killed monster. Hidden fusion mission progress dialog added to desktop and mobile.
