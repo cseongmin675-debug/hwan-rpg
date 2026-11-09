@@ -455,7 +455,9 @@ function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('sho
 function particle(x,y,color,n=9,size=5){for(let i=0;i<n;i++)particles.push({x,y,vx:rand(-140,140),vy:rand(-150,65),life:rand(.35,.85),max:.85,color,size:rand(2,size)})}function floatText(x,y,t,c='#ffe3a1'){floats.push({x,y,text:t,life:1,color:c})}
 function gainXp(v){if(!player)return;if(player.lv>=MAX_LEVEL){player.lv=50;player.xp=0;player.masteryXp=(player.masteryXp||0)+v;while(player.masteryXp>=25000){player.masteryXp-=25000;player.mastery=(player.mastery||0)+1;player.maxHp+=25;player.maxMp+=12;player.gold+=500;player.hp=player.maxHp;player.mp=player.maxMp;toast('⭐ Lv.50 유지! 초월 성장 +1 · 체력/마나/골드 보너스');particle(player.x,player.y,'#ffd6a0',35)}return}player.xp+=v;let ups=0;while(player.lv<MAX_LEVEL&&player.xp>=xpRequired(player.lv)){player.xp-=xpRequired(player.lv);player.lv++;ups++;player.maxHp+=15;player.maxMp+=7;player.hp=player.maxHp;player.mp=player.maxMp;particle(player.x,player.y,'#ffd77d',35);log(`레벨 ${player.lv} 달성! 공격력 +3 · 최대 체력 +15 · 마력 +7`)}if(player.lv>=MAX_LEVEL)player.xp=0;if(ups)toast(`⭐ 레벨 UP! Lv.${player.lv}`);if(player.lv>=5&&player.stage===0&&player.quests.advance1.state==='locked'){player.quests.advance1.state='available';toast('🧙 5레벨 달성! 먼 지역의 전직관을 찾아 전직 퀘스트를 받아!')}if(player.lv>=30&&player.stage===1&&player.quests.advance2.state==='locked'){player.quests.advance2.state='available';toast('👑 30레벨 달성! 자신의 전직관에게 2차 전직 퀘스트를 받아!')}}
 function questKilled(t){secretKill(t);if(player.skillTraining&&player.skillTraining.target===t){player.skillTraining.count=Math.min(player.skillTraining.need,player.skillTraining.count+1);if(player.skillTraining.count===player.skillTraining.need)toast('📖 스킬 수련 완료! 담당 전직관에게 돌아가!')}for(const q of SIDE_QUESTS){if(q.kind==='kill'&&q.type===t&&player.sideQuests[q.id]?.state==='active')player.sideQuests[q.id].count=Math.min(q.count,(player.sideQuests[q.id].count||0)+1)}let q=player.quests.starter;if(q.state==='active'&&player.weapon==='나무몽둥이'&&t===0)q.count++;let a=player.quests.advance1;if(a.state==='active'&&(t===a.target))a.count++;let b=player.quests.advance2;if(b.state==='active'&&(t===b.target))b.count++;}
-function killEnemy(e){if(!e.boss&&!e.raidBoss)player.lastSlainAnimal={type:e.type,name:ENEMY_TYPES[e.type]?.name||'야생 동물'};e.alive=false;e.respawn=e.boss?1e12:(e.raidBoss?100:rand(12,23));player.kills++;seaStoryKilled(e);
+function killEnemy(e){
+ const victim=e.raidBoss?{name:e.raidName,icon:e.raidIcon,color:e.raidColor,type:-1}:e.boss?{name:'혼돈의 수호자',icon:'👹',color:'#d6a574',type:-1}:{type:e.type,name:ENEMY_TYPES[e.type]?.name||'야생 동물',icon:ENEMY_TYPES[e.type]?.icon||'🐺',color:ENEMY_TYPES[e.type]?.color||'#dcd3c2'};
+ player.lastSlainAnimal=victim;e.alive=false;e.respawn=e.boss?1e12:(e.raidBoss?100:rand(12,23));player.kills++;seaStoryKilled(e);
 const t=e.raidBoss?{xp:e.lv*120,gold:e.lv*65,color:e.raidColor}:e.boss?{xp:700,gold:850,color:'#ffcb77'}:ENEMY_TYPES[e.type];
 if(!e.boss&&t.loot&&Math.random()<t.chance){player.inventory[t.loot]=(player.inventory[t.loot]||0)+1;if(['마력 광석','용의 비늘','용암 핵','망령의 조각'].includes(t.loot)){player.careerMaterialEarned=player.careerMaterialEarned||{};player.careerMaterialEarned[t.loot]=(player.careerMaterialEarned[t.loot]||0)+1;}floatText(e.x,e.y-28,`🎒 ${t.loot} +1`,'#ffda9c');log('🎁 '+t.loot+' 획득!')}
 if(!e.boss&&WEAPON_DROPS[e.type]&&Math.random()<WEAPON_DROPS[e.type][1]){let w=WEAPON_DROPS[e.type][0];if(!player.weapons.includes(w))player.weapons.push(w);floatText(e.x,e.y-56,'⚔️ '+w,'#f7d882');log('✨ 희귀 무기 발견: '+w);toast('⚔️ 새 무기 '+w+'! 인벤토리에서 장착해!')}
@@ -488,7 +490,7 @@ function respawnAtVillage(){player.oceanAccess=false;
   log('💀 쓰러져 마을의 시작 지점에서 다시 태어났다.');
   save();
 }
-function damagePlayer(d){if(!player||player.hp<=0||returnHeld||performance.now()<(player.reviveProtection||0))return;d=Math.max(1,Math.round(d*(100/(100+armorDef()*7))));player.hp=Math.max(0,player.hp-d);secretDangerEvolution();particle(player.x,player.y,'#ff717d',7);floatText(player.x,player.y,`-${d}`,'#ff9b9b');if(player.hp<=0)respawnAtVillage();updateHUD()}
+function damagePlayer(d){if(!player||player.hp<=0||returnHeld||performance.now()<(player.reviveProtection||0))return;d=Math.max(1,Math.round(d*(100/(100+armorDef()*7))));player.hp=Math.max(0,player.hp-d);secretDangerEvolution();particle(player.x,player.y,'#ff717d',7);floatText(player.x,player.y,`-${d}`,'#ff9b9b');if(player.hp<=0){hiddenEvolutionOnDeath();respawnAtVillage();}updateHUD()}
 function nearestEnemy(max=240){let best=null,bd=max;for(const e of enemies){if(!e.alive||!sameRealm(e))continue;let d=dist(player,e);if(d<bd){bd=d;best=e}}return best}
 function attack(){
  if(!player||dialogOpen||returnHeld)return;
@@ -518,8 +520,12 @@ function castDistinctVisual(name,job,x,y,at,slot=0){const col=JOBS[job]?.[3]||'#
 }
 // Persistent wolf familiar for the tamer. It follows its owner, hunts nearby monsters, and has a visible attack animation.
 let wolfFamiliar=null;
-function summonWolf(){if(!player)return;wolfFamiliar={x:player.x+35,y:player.y+27,hp:160+player.lv*20,nextAttack:0,until:performance.now()+120000};
-  particle(wolfFamiliar.x,wolfFamiliar.y,'#9cf2c0',35,8);toast('🐺 전투 늑대가 소환됐어! (2분)');}
+function summonWolf(){if(!player)return;
+ const duration=180000;const now=performance.now();
+ if(wolfFamiliar&&wolfFamiliar.until>now){wolfFamiliar.until=now+duration;wolfFamiliar.hp=Math.max(wolfFamiliar.hp,250+player.lv*25);toast('🐺 소환 늑대의 시간이 3분으로 연장됐어!');}
+ else{wolfFamiliar={x:player.x+35,y:player.y+27,hp:250+player.lv*25,nextAttack:0,until:now+duration};toast('🐺 전투 늑대를 소환했어! (3분)');}
+ particle(wolfFamiliar.x,wolfFamiliar.y,'#9cf2c0',35,8);
+ }
 function updateWolf(dt){if(!wolfFamiliar||!player)return;const w=wolfFamiliar;if(performance.now()>w.until){wolfFamiliar=null;return}
  let target=null,nearest=340;for(const e of enemies){if(!e.alive||!sameRealm(e))continue;let d=dist(w,e);if(d<nearest){nearest=d;target=e}}
  const dest=target||player;const d=dist(w,dest);
@@ -539,7 +545,7 @@ function summonSkeleton(){
  const info=player?.lastSlainAnimal;if(!info){toast('💀 먼저 몬스터를 한 마리 처치해야 해!');return}
  if(skeletonArmy.length>=10){toast('💀 해골 소환 최대 10마리!');return}
  const a=Math.random()*6.28;
- skeletonArmy.push({x:player.x+Math.cos(a)*42,y:player.y+Math.sin(a)*42,hp:100,maxHp:100,atk:150,nextAttack:0,kind:info.name});
+ skeletonArmy.push({x:player.x+Math.cos(a)*42,y:player.y+Math.sin(a)*42,hp:100,maxHp:100,atk:150,nextAttack:0,kind:info.name,icon:info.icon||'🐺',color:info.color||'#b7a8ce',type:info.type});
  particle(player.x,player.y,'#c4b8ff',25);toast('💀 '+info.name+' 해골 소환! '+skeletonArmy.length+'/10');
 }
 function updateSkeletons(dt){
@@ -548,11 +554,27 @@ function updateSkeletons(dt){
  for(const e of enemies){if(!e.alive||!sameRealm(e))continue;const d=dist(a,e);if(d<bd){target=e;bd=d}}
  if(dist(a,player)>500){a.x=player.x-25;a.y=player.y+25}
  const dest=target||player,d=dist(a,dest)||1;if(d>48){a.x+=(dest.x-a.x)/d*dt*225;a.y+=(dest.y-a.y)/d*dt*225}
- if(target&&d<90&&now>a.nextAttack){a.nextAttack=now+1200;damageEnemy(target,150,'#ddd5ff');particle(target.x,target.y,'#b8aaff',7);}
+ if(target&&d<90&&now>a.nextAttack){a.nextAttack=now+1200;damageEnemy(target,a.atk,'#ddd5ff');particle(target.x,target.y,'#b8aaff',7);}
  }}
-function drawSkeletons(){for(const a of skeletonArmy){const x=a.x-cam.x,y=a.y-cam.y;if(x<-60||x>W+60||y<-60||y>H+60)continue;
- ctx.save();ctx.translate(x,y);ctx.fillStyle='#e7dfcb';ctx.strokeStyle='#dcd2c9';ctx.lineWidth=4;
- ctx.beginPath();ctx.arc(0,-24,9,0,7);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(0,-14);ctx.lineTo(0,2);ctx.moveTo(-12,-9);ctx.lineTo(12,-9);ctx.moveTo(0,2);ctx.lineTo(-10,17);ctx.moveTo(0,2);ctx.lineTo(10,17);ctx.stroke();ctx.fillStyle='#8e4fca';ctx.fillRect(-5,-26,3,3);ctx.fillRect(3,-26,3,3);ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillStyle='#e7d9ff';ctx.fillText('💀 '+a.kind.slice(0,9)+' · 100HP',0,-44);ctx.restore();}}
+function drawSkeletons(){for(const a of skeletonArmy){const x=a.x-cam.x,y=a.y-cam.y;if(x<-90||x>W+90||y<-90||y>H+90)continue;
+ ctx.save();ctx.translate(x,y);const walk=Math.sin(frame*.22+a.x*.03)*3;
+ ctx.fillStyle='#0c152950';ctx.beginPath();ctx.ellipse(0,19,21,5,0,0,Math.PI*2);ctx.fill();
+ ctx.strokeStyle='#f5edda';ctx.fillStyle='#ded7ca';ctx.lineWidth=3.5;ctx.lineCap='round';
+ const animal=/🐺|🦊|🐗|🐉|🐇|🐁|🐊|🦎|🐸|🐕/.test(a.icon||'');
+ if(animal){
+  ctx.beginPath();ctx.ellipse(0,-7,21,11,0,0,Math.PI*2);ctx.stroke();
+  for(let k=-2;k<=2;k++){ctx.beginPath();ctx.moveTo(k*6,-15);ctx.lineTo(k*6,-1);ctx.stroke();}
+  ctx.beginPath();ctx.moveTo(14,-13);ctx.lineTo(26,-17);ctx.lineTo(35,-9);ctx.lineTo(24,-4);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-15,0);ctx.lineTo(-18+walk,15);ctx.moveTo(10,0);ctx.lineTo(13-walk,15);ctx.moveTo(-21,-5);ctx.lineTo(-29,-12);ctx.stroke();
+  ctx.fillStyle='#d8a3ff';ctx.fillRect(27,-13,4,3);
+ }else{
+  ctx.beginPath();ctx.arc(0,-24,9,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,-14);ctx.lineTo(0,2);ctx.moveTo(-11,-8);ctx.lineTo(11,-8);ctx.moveTo(0,2);ctx.lineTo(-10+walk,17);ctx.moveTo(0,2);ctx.lineTo(10-walk,17);ctx.stroke();
+  ctx.fillStyle='#a46adf';ctx.fillRect(-5,-26,3,3);ctx.fillRect(3,-26,3,3);
+ }
+ ctx.fillStyle='#0e1729cc';ctx.fillRect(-57,-58,114,17);
+ ctx.textAlign='center';ctx.fillStyle='#f1e5ff';ctx.font='bold 11px sans-serif';ctx.fillText('💀 '+a.kind.slice(0,11)+' · HP100',0,-46);
+ ctx.restore();}}
 function sameRealm(e){return !!e.ocean===!!player.oceanAccess}
 // 12 consecutive sea-story chapters with rewards.
 const SEA_STORIES=[
@@ -575,20 +597,24 @@ function openSeaStory(){if(!player)return;const st=seaStoryData(),ch=SEA_STORIES
 
 function useSkill(slot){
  if(!player||returnHeld)return;if(dialogOpen){toast('배낭이나 대화창을 닫고 스킬을 사용해!');return}ensureSkillSlots();if(player.job===HIDDEN_JOB){useHiddenSkill(slot);return}
- const assigned=player.skillSlots?.[slot];if(!assigned){toast('🎒 B 배낭에서 기술을 장착해!');return}
+ let assigned=player.skillSlots?.[slot];if(player.job===NECRO_JOB){
+ const oldNames={'사령의 손길':'해골 부활','해골 소환':'망자의 사슬'};
+ if(oldNames[assigned]){const old=assigned;assigned=oldNames[old];player.skillSlots[slot]=assigned;player.learnedSkills=(player.learnedSkills||[]).map(n=>oldNames[n]||n);save();}
+ }
+ if(!assigned){toast('🎒 B 배낭에서 기술을 장착해!');return}
  if(!(player.learnedSkills||[]).includes(assigned)){toast('아직 배우지 못한 기술이야!');return}
  const i=CAREER_SKILLS[player.job]?.indexOf(assigned)??-1;if(i<0){toast('이 직업에서 사용할 수 없는 스킬이야. 배낭에서 다른 기술을 장착해 줘!');return}
- const arrowSkill=(player.job===2||player.job===18||/화살|사격|정조준|추격|폭풍|매의 눈/.test(assigned)&&/화살|사격|정조준|추격|매의 눈/.test(assigned));
+ const arrowSkill=(player.job===2||player.job===18||player.job===25||/화살|사격|정조준|추격|매의 눈/.test(assigned));
  if(arrowSkill&&(player.inventory['화살']||0)<1){toast('🏹 화살 스킬은 화살이 있어야 사용 가능해!');return;}
  const now=performance.now(),cost=[13,26,40][i],cool=[3.8,7.5,13][i];
  player.skillAt=player.skillAt||[0,0,0];if(player.mp<cost){toast('💠 마력이 부족해!');return}
  if(player.skillAt[i]&&now-player.skillAt[i]<cool*1000){toast('⏳ 스킬 재사용 대기 중');return}
  player.skillAt[i]=now;player.mp-=cost;if(arrowSkill)player.inventory['화살']--;player.attackAnimationAt=now;
  castDistinctVisual(assigned,player.job,player.x,player.y,now,i);
+ if(player.job===NECRO_JOB && i===0)summonSkeleton();
  const radius=[185,240,310][i],power=distinctSkillPower(assigned),enemiesHit=[];
  for(const e of enemies){if(e.alive&&dist(player,e)<radius){damageEnemy(e,power,JOBS[player.job][3]);enemiesHit.push(e)}}
  if(player.job===12 && (assigned==='늑대 소환'||i===1))summonWolf();
- if(player.job===NECRO_JOB)summonSkeleton();
  if([4,13].includes(player.job)||/치유|축복|응원|기도|비약/.test(assigned)){
    const restore=Math.round(player.maxHp*(.08+i*.06));player.hp=Math.min(player.maxHp,player.hp+restore);floatText(player.x,player.y-60,'💚 +'+restore,'#a2ffd3');}
  if(player.job===3&&enemiesHit.length){damageEnemy(enemiesHit[0],Math.round(power*.34),'#e6a4ed')}
@@ -610,12 +636,23 @@ const CAREER_SKILLS=[
  ['덩굴 채찍','정령 소환','숲의 분노'],['환영탄','분신 연격','몽환 결계'],['관통 사격','덫 폭발','최후의 추격'],['부채 일격','검무 회오리','달빛의 춤']
 ];
 
-CAREER_SKILLS.push(['사령의 손길','해골 소환','망자의 군단']);
+CAREER_SKILLS.push(['해골 부활','망자의 사슬','망자의 군단']);
 // 비밀 전직: 공개 직업 목록 / NPC / 미니맵 표지에는 표시하지 않는다.
 const HIDDEN_JOB=21, NECRO_JOB=20, SECRET_CORNER={x:48,y:48};
 const SECRET_ROOM={x:28100,y:19400,w:960,h:600};
 JOBS.push(['...','✦','정체불명의 힘','#d6acff',['...','...']]);
 CAREER_SKILLS.push(['무형의 파동','혼돈의 공명','운명의 재구성']);
+
+// 새 직업 4종: 기존 히든 직업(인덱스 21)과 저장 데이터를 절대로 이동시키지 않는다.
+const NEW_JOB_START=22;
+const EXTRA_CAREERS=[
+ {job:['룬기사','ᚱ','룬 검술과 대지 방벽','#46e8df',['룬검사','룬제왕']],skills:['룬 파쇄','룬 폭풍','룬의 심판'],spot:[13500,5300]},
+ {job:['폭풍술사','⚡','번개와 기류를 지배하는 마법사','#f6df52',['뇌전술사','천뢰군주']],skills:['번개 창','천둥 연쇄','낙뢰 강림'],spot:[15400,7150]},
+ {job:['혈마법사','🩸','핏빛 화염과 흡혈 주문','#ef5b78',['혈염술사','진홍마왕']],skills:['혈염탄','붉은 맥동','핏빛 일식'],spot:[17600,4050]},
+ {job:['성운궁수','🌌','별빛 화살과 은하계 사격','#82b8ff',['별빛추적자','은하사수']],skills:['성광 사격','유성 화살비','성운 소나기'],spot:[20200,7800]}
+];
+EXTRA_CAREERS.forEach((c,i)=>{const j=NEW_JOB_START+i;JOBS.push(c.job);CAREER_SKILLS.push(c.skills);TRAINER_SPOTS.push(c.spot);NPCS.push({id:'trainer',job:j,x:c.spot[0],y:c.spot[1],name:c.job[0]+' 전직관',icon:c.job[1],color:c.job[3]})});
+
 let secretCornerLatched=false,secretEvolveAt=0;
 function enterSecretRoom(){if(!player||player.secretRoom)return;player.secretRoom=true;player.x=SECRET_ROOM.x+W/2;player.y=SECRET_ROOM.y+H-115;secretCornerLatched=true;closeDialog();particle(player.x,player.y,'#e1b8ff',32);toast('✦ 정체를 알 수 없는 공간에 들어왔다. 중앙의 인물에게 E로 대화해 봐.');save();}
 function leaveSecretRoom(){if(!player)return;player.secretRoom=false;player.x=125;player.y=135;secretCornerLatched=true;closeDialog();particle(player.x,player.y,'#a7e7ff',40);toast('🏡 이장 마을로 돌아왔어.');save();}
@@ -698,7 +735,7 @@ function useHiddenSkill(slot){
  const now=performance.now();player.hiddenSkillAt=player.hiddenSkillAt||{};
  const last=player.hiddenSkillAt[name]||0,cd=name==='무형의 파동'?3000:(name.startsWith('융합 · ')?12000:4500);
  if(last&&now-last<cd){toast('⏳ '+Math.ceil((cd-(now-last))/1000)+'초 남음');return}
- const usesArrow=/(화살|사격|정조준|매의 눈|추격)/.test(name)||careerForSkill(name)===2||careerForSkill(name)===18;
+ const usesArrow=/(화살|사격|정조준|매의 눈|추격)/.test(name)||[2,18,25].includes(careerForSkill(name));
  player.inventory=player.inventory||{};
  if(usesArrow&&(player.inventory['화살']||0)<1){toast('🏹 화살이 부족해! 잡화상인에게서 화살을 사 줘.');return}
  const cost=name.startsWith('융합 · ')?48:20;if(player.mp<cost){toast('마력이 부족해!');return}
@@ -710,15 +747,32 @@ function useHiddenSkill(slot){
  castDistinctVisual(name,job,player.x,player.y,now,slot);
  for(const e of enemies){if(e.alive&&dist(player,e)<range)damageEnemy(e,power+((player.evolvedSkills||[]).includes(name)?40:0),JOBS[job]?.[3]||'#e8baff')}
  if(name==='늑대 소환'||parts.includes('늑대 소환'))summonWolf();
+ if(name==='해골 부활'||name==='사령의 손길'||name==='해골 소환'||parts.includes('해골 부활'))summonSkeleton();
  if(/치유|축복|응원|기도/.test(name))player.hp=Math.min(player.maxHp,player.hp+Math.round(player.maxHp*.24));
  floatText(player.x,player.y-90,'✦ '+name,JOBS[job]?.[3]||'#e7aaff');updateHUD();save();
 }
-function secretDangerEvolution(){if(player.job!==HIDDEN_JOB||player.stage<2||player.hp>player.maxHp*.3)return;
- const now=performance.now();if(now-secretEvolveAt<30000||Math.random()>.25)return;secretEvolveAt=now;
- const options=(player.learnedSkills||[]).filter(x=>!(player.evolvedSkills||[]).includes(x));if(!options.length)return;
- const name=options[Math.floor(Math.random()*options.length)];player.evolvedSkills=player.evolvedSkills||[];player.evolvedSkills.push(name);player.hp=Math.min(player.maxHp,player.hp+player.maxHp*.2);
- particle(player.x,player.y,'#f1aaff',115,14);floatText(player.x,player.y-100,'✦ '+name+' 진화','#ffd5ff');toast('⚡ 위기 각성! '+name+' 진화!');save();
+// 히든 직업 전용: 전직 시점부터 30분마다 30초 동안 열리는 사망 진화 창.
+function hiddenEvolutionWindow(){
+ if(!player||player.job!==HIDDEN_JOB)return {active:false,remaining:0,next:0};
+ const now=Date.now();player.hiddenEvolveBorn=player.hiddenEvolveBorn||now;
+ const elapsed=Math.max(0,now-player.hiddenEvolveBorn),period=1800000,windowMs=30000;
+ const within=elapsed%period;
+ return {active:elapsed>=period&&within<windowMs,remaining:Math.ceil((period-within)/1000),windowRemaining:Math.ceil((windowMs-within)/1000),round:Math.floor(elapsed/period)};
 }
+function hiddenEvolutionOnDeath(){
+ if(!player||player.job!==HIDDEN_JOB)return;
+ const w=hiddenEvolutionWindow();if(!w.active)return;
+ if(player.hiddenEvolveLastRound===w.round)return;
+ const options=(player.learnedSkills||[]).filter(n=>n&&!((player.evolvedSkills||[]).includes(n)));
+ if(!options.length){toast('✦ 진화할 수 있는 새로운 스킬이 없어!');return;}
+ const name=options[Math.floor(Math.random()*options.length)];
+ player.evolvedSkills=player.evolvedSkills||[];player.evolvedSkills.push(name);
+ player.hiddenEvolveLastRound=w.round;
+ particle(player.x,player.y,'#f1aaff',115,14);
+ floatText(player.x,player.y-100,'✦ '+name+' 진화','#ffd5ff');
+ toast('⚡ 30분 운명 각성! 사망으로 '+name+' 스킬 진화!');save();
+}
+function secretDangerEvolution(){ /* 다른 피해량에 의해 자동 진화하지 않는다. 사망만 검사. */ }
 
 function demoCareer(jobIndex,level=1){
  const n=NPCS.find(v=>v.id==='trainer'&&v.job===jobIndex);if(!n)return;
@@ -855,11 +909,16 @@ function attemptUpgrade(name){
 }
 function bard(){showDialog('수다쟁이 음유시인','🎵 땅이 흔들리고 왕의 시계는 멈췄다네~! <br>동쪽 유적의 거대한 수호자를 물리치면 왕국의 첫 이야기가 끝난다네! <br>용감한 모험가가 등장하면 왕국의 운명도 달라진다네!', [['왕국을 구할 거야!',()=>{player.storyChoices.push('왕국의 수호자');player.flags.acceptedBoss=true;log('메인 이야기: 동쪽 유적의 수호자 조사');closeDialog();save()}],['보물만 찾을래!',()=>{player.storyChoices.push('보물 사냥꾼');player.flags.acceptedBoss=true;log('메인 이야기: 동쪽 유적으로 향하기');closeDialog();save()}]])}
 function zone(){for(const r of REGIONS)if(player.x>=r.x&&player.x<=r.x+r.w&&player.y>=r.y&&player.y<=r.y+r.h)return r.name;if(player.x>=600&&player.x<=2500&&player.y>=120&&player.y<=1600)return '🐇 시작의 토끼 숲';if(player.x<750&&player.y<800)return '🏘️ 엉뚱한 마을';if(player.x>4100&&player.y>1800)return '🏛️ 잊힌 황무지';if(player.y>2300)return '🍂 남쪽 붉은 숲';if(player.x>3400)return '⛰️ 먼 산의 땅';if(player.x>1800)return '🌳 깊은 숲';return '🌲 수상한 숲'}
-function updateHUD(){if(!player)return;$('name').textContent=player.nick+' · Lv.'+Math.min(50,player.lv)+(player.mastery?' · 초월 '+player.mastery:'');$('level').textContent='⚔️ 공격력 '+attackStat();$('job').textContent=player.finalJob||player.specialization||(player.job>=0?JOBS[player.job][0]:'초보 모험가');$('money').textContent=Math.max(0,player.gold)+' G';$('weapon').textContent='⚔️ 무기: '+(player.weapon||'맨손')+(equipmentUpgrade(player.weapon)?' +'+equipmentUpgrade(player.weapon):'')+' (+'+weaponAtk()+' 공격력)';$('armorHUD').textContent='🛡️ 방어구: '+(player.armor||'없음')+' (방어력 '+armorDef()+')';$('hpText').textContent=`${Math.ceil(player.hp)}/${player.maxHp}`;$('mpText').textContent=`${Math.ceil(player.mp)}/${player.maxMp}`;$('xpText').textContent=player.lv>=MAX_LEVEL?'MAX · Lv.50':`${player.xp}/${xpRequired(player.lv)}`;$('hpBar').style.width=player.hp/player.maxHp*100+'%';$('mpBar').style.width=player.mp/player.maxMp*100+'%';$('xpBar').style.width=(player.lv>=MAX_LEVEL?100:Math.min(100,player.xp/xpRequired(player.lv)*100))+'%';$('potions').textContent=player.potions;$('rabbitLiver').textContent=(player.inventory?.['토끼 간']||0)+'개';$('arrowCount').textContent=(player.inventory?.['화살']||0)+'개';$('kills').textContent='처치 '+player.kills;$('zoneTag').textContent=zone();let q=player.quests,out=[];const sq=secretState();if(sq.status==='active')out.push(`<div class="quest"><strong>📜 정체불명의 시련</strong><br>${secretRequirement.map((r,i)=>r.label+' '+(sq.kills[i]||0)+'/'+r.need).join(' · ')}<div class="progress">광석 ${(player.inventory['마력 광석']||0)}/3 · 용비늘 ${(player.inventory['용의 비늘']||0)}/2</div></div>`);if(sq.status==='awaken')out.push(`<div class="quest"><strong>✦ 두 번째 시련</strong><br>푸른 드레이크 ${sq.awakeningKills||0}/10</div>`);if(q.starter.state==='active')out.push(`<div class="quest"><strong>🐇 초원의 첫 임무</strong><br>토끼 3마리 처치<div class="progress">${q.starter.count}/3 ${q.starter.count>=3?'· 촌장에게 보고!':''}</div></div>`);if(q.starter.state==='unstarted')out.push('<div class="quest"><strong>🪵 이장의 첫 선물</strong><br>마을 이장에게 말을 걸어 나무몽둥이를 받기</div>');if(player.stage===0)out.push(`<div class="quest"><strong>⚔️ 1차 전직 (Lv.5)</strong><br>${player.lv<5?'5레벨 달성 후 원하는 전직관에게 퀘스트 수락':q.advance1.state==='active'?`${ENEMY_TYPES[q.advance1.target].name} 5마리 처치`: '원하는 전직관에게 퀘스트 수락'}<div class="progress">${q.advance1.state==='active'?q.advance1.count+'/5':'퀘스트 완료 후에만 전직 가능'}</div></div>`);if(player.stage===1&&player.job!==HIDDEN_JOB)out.push(`<div class="quest"><strong>👑 2차 전직 (Lv.30)</strong><br>${player.lv<30?'레벨 30 달성':q.advance2.state==='active'?'혼돈의 늑대 8마리 처치':'내 직업 전직관에게 퀘스트 수락'}<div class="progress">${q.advance2.state==='active'?q.advance2.count+'/8':'퀘스트 완료 후에만 전직 가능'}</div></div>`);if(player.stage===2)out.push('<div class="quest"><strong>👑 2차 전직 완료!</strong><br>새로운 시련을 기다려!</div>');if(!player.flags.boss)out.push('<div class="quest"><strong>🏰 메인 스토리</strong><br>동쪽 유적의 혼돈 수호자 처치</div>');else out.push('<div class="quest"><strong>🏆 스토리 1장 완료</strong><br>왕국의 시계가 다시 움직여!</div>');if(player.skillTraining){let t=player.skillTraining;out.push(`<div class="quest"><strong>✨ ${CAREER_SKILLS[t.job][t.index]} 수련</strong><br>${ENEMY_TYPES[t.target].name} 처치<div class="progress">${t.count}/${t.need} · ${t.count>=t.need?'전직관에게 보고!':'훈련 중'}</div></div>`)}for(const q of SIDE_QUESTS){const p=player.sideQuests[q.id];if(p?.state!=='active')continue;let d=q.kind==='kill'?`${p.count}/${q.count} 처치`:q.kind==='collect'?`${player.inventory[q.item]||0}/${q.count} 수집`:p.count?'전달 완료!':'대상 NPC 찾기';out.push(`<div class="quest"><strong>📜 ${q.title}</strong><br>${q.txt}<div class="progress">${d} · 의뢰인에게 보고</div></div>`)}$('quests').innerHTML=out.join('');if(!pinnedCollapsed){$('pinnedQuestItems').innerHTML=out.filter(x=>!x.includes('2차 전직 완료!')).slice(0,5).join('')||'<span class="emptyQ">진행 중인 임무가 없어</span>';} $('career').innerHTML=`기본 직업: <b>${(player.job>=0?JOBS[player.job][0]:'초보 모험가')}</b><br>1차: <b>${player.specialization||'Lv.5 이후 전직관 퀘스트'}</b><br>2차: <b>${player.finalJob||'미전직 (Lv.30 + 퀘스트)'}</b>`;let now=performance.now(),cool=[3.8,7.5,13];$('skills').innerHTML=(player.skillSlots||[]).map((name,slot)=>{const idx=player.job>=0?CAREER_SKILLS[player.job].indexOf(name):-1;let sec=player.job===HIDDEN_JOB&&name?Math.max(0,((name==='무형의 파동'?3000:name.startsWith('융합 · ')?12000:4500)-(now-((player.hiddenSkillAt||{})[name]||0)))/1000):idx>=0?Math.max(0,cool[idx]-(now-player.skillAt[idx])/1000):0;return `<div class="skill"><b>${slot+1} · ${name||'빈 슬롯'}</b><br><span class="muted">${idx>=0?([13,26,40][idx]+' MP · '+(sec?sec.toFixed(1)+'초':'사용 가능')):'B 배낭에서 배치'}</span></div>`}).join('');renderBelt()}
+function updateHUD(){if(!player)return;$('name').textContent=player.nick+' · Lv.'+Math.min(50,player.lv)+(player.mastery?' · 초월 '+player.mastery:'');$('level').textContent='⚔️ 공격력 '+attackStat();$('job').textContent=player.finalJob||player.specialization||(player.job>=0?JOBS[player.job][0]:'초보 모험가');$('money').textContent=Math.max(0,player.gold)+' G';$('weapon').textContent='⚔️ 무기: '+(player.weapon||'맨손')+(equipmentUpgrade(player.weapon)?' +'+equipmentUpgrade(player.weapon):'')+' (+'+weaponAtk()+' 공격력)';$('armorHUD').textContent='🛡️ 방어구: '+(player.armor||'없음')+' (방어력 '+armorDef()+')';$('hpText').textContent=`${Math.ceil(player.hp)}/${player.maxHp}`;$('mpText').textContent=`${Math.ceil(player.mp)}/${player.maxMp}`;$('xpText').textContent=player.lv>=MAX_LEVEL?'MAX · Lv.50':`${player.xp}/${xpRequired(player.lv)}`;$('hpBar').style.width=player.hp/player.maxHp*100+'%';$('mpBar').style.width=player.mp/player.maxMp*100+'%';$('xpBar').style.width=(player.lv>=MAX_LEVEL?100:Math.min(100,player.xp/xpRequired(player.lv)*100))+'%';$('potions').textContent=player.potions;$('rabbitLiver').textContent=(player.inventory?.['토끼 간']||0)+'개';$('arrowCount').textContent=(player.inventory?.['화살']||0)+'개';$('kills').textContent='처치 '+player.kills;$('zoneTag').textContent=zone();let q=player.quests,out=[];const sq=secretState();if(sq.status==='active')out.push(`<div class="quest"><strong>📜 정체불명의 시련</strong><br>${secretRequirement.map((r,i)=>r.label+' '+(sq.kills[i]||0)+'/'+r.need).join(' · ')}<div class="progress">광석 ${(player.inventory['마력 광석']||0)}/3 · 용비늘 ${(player.inventory['용의 비늘']||0)}/2</div></div>`);if(sq.status==='awaken')out.push(`<div class="quest"><strong>✦ 두 번째 시련</strong><br>푸른 드레이크 ${sq.awakeningKills||0}/10</div>`);if(q.starter.state==='active')out.push(`<div class="quest"><strong>🐇 초원의 첫 임무</strong><br>토끼 3마리 처치<div class="progress">${q.starter.count}/3 ${q.starter.count>=3?'· 촌장에게 보고!':''}</div></div>`);if(q.starter.state==='unstarted')out.push('<div class="quest"><strong>🪵 이장의 첫 선물</strong><br>마을 이장에게 말을 걸어 나무몽둥이를 받기</div>');if(player.stage===0)out.push(`<div class="quest"><strong>⚔️ 1차 전직 (Lv.5)</strong><br>${player.lv<5?'5레벨 달성 후 원하는 전직관에게 퀘스트 수락':q.advance1.state==='active'?`${ENEMY_TYPES[q.advance1.target].name} 5마리 처치`: '원하는 전직관에게 퀘스트 수락'}<div class="progress">${q.advance1.state==='active'?q.advance1.count+'/5':'퀘스트 완료 후에만 전직 가능'}</div></div>`);if(player.stage===1&&player.job!==HIDDEN_JOB)out.push(`<div class="quest"><strong>👑 2차 전직 (Lv.30)</strong><br>${player.lv<30?'레벨 30 달성':q.advance2.state==='active'?'혼돈의 늑대 8마리 처치':'내 직업 전직관에게 퀘스트 수락'}<div class="progress">${q.advance2.state==='active'?q.advance2.count+'/8':'퀘스트 완료 후에만 전직 가능'}</div></div>`);if(player.stage===2)out.push('<div class="quest"><strong>👑 2차 전직 완료!</strong><br>새로운 시련을 기다려!</div>');if(!player.flags.boss)out.push('<div class="quest"><strong>🏰 메인 스토리</strong><br>동쪽 유적의 혼돈 수호자 처치</div>');else out.push('<div class="quest"><strong>🏆 스토리 1장 완료</strong><br>왕국의 시계가 다시 움직여!</div>');if(player.skillTraining){let t=player.skillTraining;out.push(`<div class="quest"><strong>✨ ${CAREER_SKILLS[t.job][t.index]} 수련</strong><br>${ENEMY_TYPES[t.target].name} 처치<div class="progress">${t.count}/${t.need} · ${t.count>=t.need?'전직관에게 보고!':'훈련 중'}</div></div>`)}for(const q of SIDE_QUESTS){const p=player.sideQuests[q.id];if(p?.state!=='active')continue;let d=q.kind==='kill'?`${p.count}/${q.count} 처치`:q.kind==='collect'?`${player.inventory[q.item]||0}/${q.count} 수집`:p.count?'전달 완료!':'대상 NPC 찾기';out.push(`<div class="quest"><strong>📜 ${q.title}</strong><br>${q.txt}<div class="progress">${d} · 의뢰인에게 보고</div></div>`)}$('quests').innerHTML=out.join('');if(!pinnedCollapsed){$('pinnedQuestItems').innerHTML=out.filter(x=>!x.includes('2차 전직 완료!')).slice(0,5).join('')||'<span class="emptyQ">진행 중인 임무가 없어</span>';} $('career').innerHTML=`기본 직업: <b>${(player.job>=0?JOBS[player.job][0]:'초보 모험가')}</b><br>1차: <b>${player.specialization||'Lv.5 이후 전직관 퀘스트'}</b><br>2차: <b>${player.finalJob||'미전직 (Lv.30 + 퀘스트)'}</b>`;if(player.job===HIDDEN_JOB){const ew=hiddenEvolutionWindow();$('career').innerHTML+=`<br><b>✦ 운명 진화</b>: ${ew.active?`발동 중! ${ew.windowRemaining}초 안에 사망하면 스킬 1개 진화`:`다음 기회 ${Math.floor(ew.remaining/60)}분 ${ew.remaining%60}초 후`}`;}let now=performance.now(),cool=[3.8,7.5,13];$('skills').innerHTML=(player.skillSlots||[]).map((name,slot)=>{const idx=player.job>=0?CAREER_SKILLS[player.job].indexOf(name):-1;let sec=player.job===HIDDEN_JOB&&name?Math.max(0,((name==='무형의 파동'?3000:name.startsWith('융합 · ')?12000:4500)-(now-((player.hiddenSkillAt||{})[name]||0)))/1000):idx>=0?Math.max(0,cool[idx]-(now-player.skillAt[idx])/1000):0;return `<div class="skill"><b>${slot+1} · ${name||'빈 슬롯'}</b><br><span class="muted">${idx>=0?([13,26,40][idx]+' MP · '+(sec?sec.toFixed(1)+'초':'사용 가능')):'B 배낭에서 배치'}</span></div>`}).join('');renderBelt()}
 function renderBelt(){if(!player)return;ensureSkillSlots();const names=player.skillSlots||[];const now=performance.now();$('skillbelt').innerHTML=names.map((name,slot)=>{const i=player.job>=0?CAREER_SKILLS[player.job].indexOf(name):-1;const remaining=player.job===HIDDEN_JOB&&name?Math.max(0,((name.startsWith('융합 · ')?12000:4500)-(now-((player.hiddenSkillAt||{})[name]||0)))/1000):i>=0?Math.max(0,[3.8,7.5,13][i]-(now-player.skillAt[i])/1000):0;return `<button class="beltcell ${!name?'empty':remaining?'cooling':''}" data-belt="${slot}" title="${name||'B 배낭에서 스킬 장착'}"><b>${slot+1}</b><span>${name||'빈 스킬칸'}</span>${remaining?`<span>${remaining.toFixed(1)}초</span>`:''}</button>`}).join('');document.querySelectorAll('[data-belt]').forEach(b=>b.onclick=()=>useSkill(Number(b.dataset.belt)))}
 let selectedBagSkill=null;
 function ensureSkillSlots(){
  if(!player)return;
+ if(player.job===NECRO_JOB && Array.isArray(player.learnedSkills)){
+   const oldNames={'사령의 손길':'해골 부활','해골 소환':'망자의 사슬'};
+   player.learnedSkills=[...new Set(player.learnedSkills.map(n=>oldNames[n]||n))];
+   if(Array.isArray(player.skillSlots))player.skillSlots=player.skillSlots.map(n=>oldNames[n]||n);
+ }
  if(!Array.isArray(player.learnedSkills))player.learnedSkills=[];
  if(!Array.isArray(player.skillSlots))player.skillSlots=[];
  player.skillSlots=player.skillSlots.slice(0,5);
@@ -869,7 +928,7 @@ function ensureSkillSlots(){
 function skillInventoryHTML(){
  const known=player.learnedSkills||[];
  const selected=selectedBagSkill && known.includes(selectedBagSkill)?selectedBagSkill:null;
- const hiddenLearn=player.job===HIDDEN_JOB?`<section class="hiddenLearn" id="hiddenLearn"><h3>✦ 히든 직업 전용 · 스킬 배우기</h3><p class="guide">원하는 직업의 스킬을 선택하고 <b>배우기</b>를 눌러! 배운 스킬은 아래 1~5번 칸에 장착해서 사용할 수 있어.</p><div class="hiddenLearnRow"><select id="hiddenSkillChoice" aria-label="배울 스킬 선택"><option value="">배울 스킬 선택하기 (${CAREER_SKILLS.slice(0,NECRO_JOB+1).flat().filter(n=>!known.includes(n)).length}개 남음)</option>${CAREER_SKILLS.slice(0,NECRO_JOB+1).map((arr,j)=>arr.map(n=>!known.includes(n)?`<option value="${n}">${JOBS[j]?.[0]||'직업'} · ${n}</option>`:'').join('')).join('')}</select><button type="button" id="hiddenSkillLearnButton" class="primary">📖 선택한 스킬 배우기</button></div><small class="muted">이미 배운 기술은 목록에서 제외돼. 직업을 바꿀 필요는 없어.</small></section>`:'';
+ const hiddenLearn=player.job===HIDDEN_JOB?`<section class="hiddenLearn" id="hiddenLearn"><h3>✦ 히든 직업 전용 · 스킬 배우기</h3><p class="guide">원하는 직업의 스킬을 선택하고 <b>배우기</b>를 눌러! 배운 스킬은 아래 1~5번 칸에 장착해서 사용할 수 있어.</p><div class="hiddenLearnRow"><select id="hiddenSkillChoice" aria-label="배울 스킬 선택"><option value="">배울 스킬 선택하기 (${CAREER_SKILLS.filter((_,j)=>j!==HIDDEN_JOB).flat().filter(n=>!known.includes(n)).length}개 남음)</option>${CAREER_SKILLS.filter((_,j)=>j!==HIDDEN_JOB).map((arr,j)=>arr.map(n=>!known.includes(n)?`<option value="${n}">${JOBS[j]?.[0]||'직업'} · ${n}</option>`:'').join('')).join('')}</select><button type="button" id="hiddenSkillLearnButton" class="primary">📖 선택한 스킬 배우기</button></div><small class="muted">이미 배운 기술은 목록에서 제외돼. 직업을 바꿀 필요는 없어.</small></section>`:'';
  return `<section class="skillmanager" id="skillmanager"><h3>✨ 나의 스킬 보관함</h3>${hiddenLearn}
   <p class="guide">① 아래 보유 스킬을 클릭해서 선택 → ② 아래 1~5번 원하는 칸을 클릭해서 장착! 이미 스킬이 있는 칸을 누르면 교체돼. 장착된 스킬을 클릭해 선택하고 <b>장착 해제</b>도 할 수 있어.</p>
   <h3>📚 보유 스킬 <small class="muted">(${known.length}개)</small></h3>
@@ -884,7 +943,7 @@ function bindSkillBag(){
   if(!player||player.job!==HIDDEN_JOB)return;
   const name=document.getElementById('hiddenSkillChoice')?.value;
   if(!name){toast('배울 스킬을 먼저 선택해 줘!');return}
-  const allowed=CAREER_SKILLS.slice(0,NECRO_JOB+1).some(a=>a.includes(name));
+  const allowed=CAREER_SKILLS.filter((_,j)=>j!==HIDDEN_JOB).some(a=>a.includes(name));
   if(!allowed){toast('선택할 수 없는 스킬이야');return}
   player.learnedSkills=Array.isArray(player.learnedSkills)?player.learnedSkills:[];
   if(player.learnedSkills.includes(name)){toast('이미 배운 스킬이야!');return}
@@ -1471,7 +1530,7 @@ const FX_GLYPHS=['⚔','✦','➶','✧','✚','✊','♆','❀','⚗','♫','�
 
 function drawSignatureSkill(m,t,x,y){
  const name=String(m.skillName||'');
- const j=careerForSkill(name),job=(j>=0&&j<20)?j:20;
+ const j=careerForSkill(name),job=(j>=0&&j<JOBS.length)?j:20;
  const moves=CAREER_SKILLS[job]||[];
  const idx=Math.max(0,moves.indexOf(name));
  const fusion=name.startsWith('융합 · ');
@@ -1479,7 +1538,7 @@ function drawSignatureSkill(m,t,x,y){
  const alpha=Math.max(0,1-time),r=40+e*(95+idx*30),color=JOBS[job]?.[3]||'#dcb1ff';
  let hash=0;for(const c of name)hash=(Math.imul(hash,31)+c.charCodeAt(0))>>>0;
  const turn=hash%2?-1:1,theta=e*Math.PI*2*turn+(hash%360)*Math.PI/180;
- const emblem=['⚔','✦','➶','✕','✝','✊','♜','❀','⚗','♫','⚙','☠','🐺','✚','☾','刃','❃','◇','➳','✿','✧'][job];
+ const emblem=['⚔','✦','➶','✕','✝','✊','♜','❀','⚗','♫','⚙','☠','🐺','✚','☾','刃','❃','◇','➳','✿','☠','✧','ᚱ','⚡','✹','✦'][job];
  ctx.save();ctx.translate(x,y-19);ctx.globalAlpha*=alpha;ctx.shadowColor=color;ctx.shadowBlur=14+idx*11;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3+idx*1.5;ctx.lineCap='round';ctx.lineJoin='round';
  const path=(points,close=false,fill=false)=>{ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));if(close)ctx.closePath();fill?ctx.fill():ctx.stroke()};
  const circ=(a,b,rad,fill=false)=>{ctx.beginPath();ctx.arc(a,b,Math.max(1,rad),0,Math.PI*2);fill?ctx.fill():ctx.stroke()};
@@ -1536,6 +1595,22 @@ function drawSignatureSkill(m,t,x,y){
    circ(0,0,r*.45);ctx.restore();
  }
  if(job===20 && !fusion){ctx.save();ctx.rotate(theta);for(let k=0;k<3;k++){ctx.beginPath();ctx.ellipse(0,0,r*(.35+k*.22),r*(.18+k*.1),k*Math.PI/3,0,7);ctx.stroke()}ctx.restore()}
+ if(job>=NEW_JOB_START && job<NEW_JOB_START+EXTRA_CAREERS.length && !fusion){
+   ctx.save();ctx.rotate(theta*.4);
+   if(job===22){ // 룬기사: concentric hexagons + sword runes
+    for(let k=0;k<3+idx;k++){let n=6,rr=r*(.23+k*.18);const pts=[];for(let q=0;q<n;q++){let a=q*Math.PI*2/n+theta*.12;pts.push([Math.cos(a)*rr,Math.sin(a)*rr]);}path(pts,true);}
+    glyph('ᚱ',0,0,25+idx*8);
+   }else if(job===23){ // 폭풍술사: electric branching lightning
+    for(let k=0;k<5+idx*3;k++){let a=k*Math.PI*2/(5+idx*3);bolt(0,0,Math.cos(a)*r*.9,Math.sin(a)*r*.9,6);}
+    circ(0,0,r*.24);glyph('ϟ',0,0,36);
+   }else if(job===24){ // 혈마법사: crimson rings & cross-shaped flames
+    for(let k=0;k<3+idx;k++){ctx.beginPath();ctx.ellipse(0,0,r*(.3+k*.18),r*(.12+k*.1),theta+k*.3,0,7);ctx.stroke();}
+    for(let k=0;k<6;k++){let a=k*Math.PI/3;glyph('✦',Math.cos(a)*r*.7,Math.sin(a)*r*.7,15+idx*3);}
+   }else if(job===25){ // 성운궁수: orbiting starlight volleys
+    for(let k=0;k<7+idx*3;k++){let a=k*Math.PI*2/(7+idx*3)+theta;let tx=Math.cos(a)*r*.75,ty=Math.sin(a)*r*.75;
+      star(tx,ty,9+idx*4,5);path([[0,0],[tx,ty]]);}
+   }ctx.restore();
+ }
  if(fusion){ctx.strokeStyle='#ffe5a0';star(0,0,r*.85,7);ctx.strokeStyle='#bf9cff';star(0,0,r*.6,5);ctx.strokeStyle='#84e8ff';circ(0,0,r*.32);glyph('✧',0,0,35)}
  ctx.restore();
 }
